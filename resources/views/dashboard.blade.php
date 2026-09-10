@@ -1,0 +1,59 @@
+@extends('layouts.app')
+
+@section('title', 'حسابي | Printora')
+
+@section('content')
+    @php
+        $roleName = match ($user->role) {
+            \App\Constants\UserRole::ADMIN => 'مدير',
+            \App\Constants\UserRole::SELLER => 'بائع',
+            \App\Constants\UserRole::DELIVERY => 'مندوب توصيل',
+            default => 'عميل',
+        };
+    @endphp
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="dashboard-card card border-0 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+                            <div>
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">تم تسجيل الدخول</span>
+                                <h1 class="fw-bold mb-2">أهلاً، {{ $user->first_name }}!</h1>
+                                <p class="text-muted-custom mb-0">دي نقطة البداية لمنطقة حسابك في مشروع الويب.</p>
+                            </div>
+
+                            <div class="brand-mark" style="width: 5rem; height: 5rem; border-radius: 1.4rem; font-size: 1.7rem;">
+                                {{ mb_strtoupper(mb_substr($user->first_name, 0, 1)) }}
+                            </div>
+                        </div>
+
+                        <hr class="my-5">
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="rounded-4 bg-light p-3 h-100">
+                                    <small class="text-muted-custom d-block mb-1">الاسم</small>
+                                    <strong>{{ $user->first_name }} {{ $user->last_name }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="rounded-4 bg-light p-3 h-100">
+                                    <small class="text-muted-custom d-block mb-1">البريد الإلكتروني</small>
+                                    <strong>{{ $user->email }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="rounded-4 bg-light p-3 h-100">
+                                    <small class="text-muted-custom d-block mb-1">نوع الحساب</small>
+                                    <strong>{{ $roleName }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
