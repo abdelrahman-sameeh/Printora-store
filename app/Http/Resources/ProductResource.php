@@ -19,6 +19,8 @@ class ProductResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'price' => $this->price,
+            'discount_amount' => $this->discount_amount,
+            'price_after_discount' => $this->price_after_discount,
             'quantity' => $this->quantity,
             'cover_image' => url($this->cover_image),
             'sub_categories' => $this->sub_categories->map(function ($sub) {
@@ -36,7 +38,7 @@ class ProductResource extends JsonResource
             'pictures' => $this->pictures->map(function ($pic) {
                 return [
                     'id' => $pic->id,
-                    'picture' =>  url($pic->picture),
+                    'picture' => url($pic->picture),
                 ];
             }),
             'attributes' => $this->attributes->map(function ($attr) {

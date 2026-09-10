@@ -2,79 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ProductAlreadyExistsException;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductPicture;
-use Auth, DB, Str;
+use App\Services\ProductService;
+use Auth, Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 
 class ProductController
 {
+  public function __construct(private readonly ProductService $productService)
+  {
+  }
 
   /** @var \App\Models\User $user */
   function create(StoreProductRequest $request)
   {
-    $user = $request->user();
-
-    // check if product already exists
-    $exist_product = $user->products()->whereSlug(Str::slug($request->title))->first();
-
-    if ($exist_product) {
+    try {
+      $product = $this->productService->create($request->user(), $request->validated());
+    } catch (ProductAlreadyExistsException $exception) {
       return response()->json([
-        'message' => 'product already exist',
+        'message' => $exception->getMessage(),
         'data' => new ProductResource(
-          $exist_product->load('sub_categories', 'pictures', 'attributes')
+          $exception->product->load('sub_categories', 'pictures', 'attributes')
         ),
       ], 409);
-
     }
-    ;
-
-    $product = DB::transaction(function () use ($request, $user) {
-      // create product
-      $product = $user->products()->create([
-        "title" => $request->title,
-        "description" => $request->description,
-        "price" => $request->price,
-        "quantity" => $request->quantity,
-      ]);
-
-      // save cover image
-      $coverPath = $request->file('cover_image')->store('products/covers', 'public');
-
-      $product->update([
-        'cover_image' => Storage::url($coverPath)
-      ]);
-
-      // save gallery
-      if ($request->hasFile('product_pictures')) {
-        $product_pictures = [];
-        foreach ($request->file('product_pictures') as $image) {
-          $path = $image->store('products/gallery', 'public');
-          $product_pictures[] = ['picture' => Storage::url($path)];
-        }
-        $product->pictures()->createMany($product_pictures);
-      };
-
-      // sub categories
-      $product->sub_categories()->sync($request->sub_categories ?? []);
-
-      // attributes
-      if ($request->filled('attributes')) {
-        foreach ($request->input('attributes') as $attr) {
-          $product->attributes()->create([
-            "key" => strtolower($attr['key']),
-            "value" => $attr['value'],
-          ]);
-        }
-      }
-
-      return $product;
-    });
 
     return response()->json([
       "message" => "product created successfully",

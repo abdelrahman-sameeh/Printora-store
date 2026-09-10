@@ -19,17 +19,41 @@
                     <div class="card-body p-4 p-md-5">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
                             <div>
-                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">تم تسجيل الدخول</span>
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">تم تسجيل
+                                    الدخول</span>
                                 <h1 class="fw-bold mb-2">أهلاً، {{ $user->first_name }}!</h1>
                                 <p class="text-muted-custom mb-0">دي نقطة البداية لمنطقة حسابك في مشروع الويب.</p>
                             </div>
 
-                            <div class="brand-mark" style="width: 5rem; height: 5rem; border-radius: 1.4rem; font-size: 1.7rem;">
+                            <div class="brand-mark"
+                                style="width: 5rem; height: 5rem; border-radius: 1.4rem; font-size: 1.7rem;">
                                 {{ mb_strtoupper(mb_substr($user->first_name, 0, 1)) }}
                             </div>
                         </div>
 
                         <hr class="my-5">
+
+                        @if ($user->role === \App\Constants\UserRole::SELLER)
+                            <div
+                                class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+                                <div>
+                                    <h2 class="h5 fw-bold mb-1">إدارة المنتجات</h2>
+                                    <p class="text-muted-custom mb-0">أضف منتجاتك وتابع المنتجات المنشورة.</p>
+                                </div>
+                                <a class="btn btn-brand px-4" href="{{ route('seller.products.index') }}">منتجاتي</a>
+                            </div>
+                        @endif
+
+                        @if ($user->role === \App\Constants\UserRole::ADMIN)
+                            <div
+                                class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+                                <div>
+                                    <h2 class="h5 fw-bold mb-1">إدارة كتالوج المتجر</h2>
+                                    <p class="text-muted-custom mb-0">أنشئ التصنيفات التي سيستخدمها البائعون في منتجاتهم.</p>
+                                </div>
+                                <a class="btn btn-brand px-4" href="{{ route('admin.categories.index') }}">إدارة التصنيفات</a>
+                            </div>
+                        @endif
 
                         <div class="row g-3">
                             <div class="col-md-4">

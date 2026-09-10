@@ -35,22 +35,36 @@ class Product extends Model
 
   public $table = 'products';
 
-  protected $appends = ['cover_image_url'];
+  protected $appends = ['cover_image_url', 'price_after_discount'];
 
   protected $fillable = [
     'title',
     'description',
     'price',
+    'discount_amount',
     'quantity',
     'seller_id',
     'cover_image',
     'is_active'
   ];
 
+  protected $casts = [
+    'price' => 'decimal:2',
+    'discount_amount' => 'decimal:2',
+  ];
+
 
   public function getCoverImageUrlAttribute()
   {
     return url($this->cover_image);
+  }
+
+  public function getPriceAfterDiscountAttribute(): float
+  {
+    $price = (float) $this->price;
+    $discount = (float) ($this->discount_amount ?? 0);
+
+    return max(0, round($price - $discount, 2));
   }
 
 
