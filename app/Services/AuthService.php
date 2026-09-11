@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Constants\UserRole;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,13 +9,14 @@ class AuthService
 {
     public function register(array $data): User
     {
-        return User::create([
+        $user = User::create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => $data['password'],
-            'role' => $this->resolveRole($data['role'] ?? 'user'),
         ]);
+
+        return $user->load('roles');
     }
 
     public function authenticate(array $credentials, bool $remember = false): ?User
@@ -28,7 +28,7 @@ class AuthService
         /** @var User $user */
         $user = Auth::guard('web')->user();
 
-        return $user;
+        return $user->loadMissing('roles');
     }
 
     public function login(User $user, bool $remember = false): void
@@ -51,12 +51,4 @@ class AuthService
         Auth::guard('web')->logout();
     }
 
-    private function resolveRole(string $role): int
-    {
-        return match (strtolower($role)) {
-            'seller' => UserRole::SELLER,
-            'delivery' => UserRole::DELIVERY,
-            default => UserRole::USER,
-        };
-    }
 }

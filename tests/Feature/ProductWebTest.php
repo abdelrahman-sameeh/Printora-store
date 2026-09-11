@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\User;
@@ -22,7 +22,6 @@ class ProductWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'buyer@example.com',
       'password' => 'password123',
-      'role' => UserRole::USER,
     ]);
 
     $this->actingAs($user)
@@ -39,8 +38,8 @@ class ProductWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'seller@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $seller->syncRoles(RoleName::SELLER);
     $category = Category::create(['title' => 'Electronics']);
     $subCategory = SubCategory::create([
       'title' => 'Phones',
@@ -99,8 +98,8 @@ class ProductWebTest extends TestCase
       'last_name' => 'Seller',
       'email' => 'details-seller@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $seller->syncRoles(RoleName::SELLER);
     $category = Category::create(['title' => 'Electronics']);
     $subCategory = SubCategory::create([
       'title' => 'Laptops',
@@ -141,8 +140,8 @@ class ProductWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'edit-seller@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $seller->syncRoles(RoleName::SELLER);
     $category = Category::create(['title' => 'Clothes']);
     $subCategory = SubCategory::create([
       'title' => 'Shirts',
@@ -214,8 +213,8 @@ class ProductWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'delete-seller@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $seller->syncRoles(RoleName::SELLER);
     $product = $seller->products()->create([
       'title' => 'Product To Delete',
       'description' => 'This product will be deleted by its seller.',
@@ -245,15 +244,15 @@ class ProductWebTest extends TestCase
       'last_name' => 'Seller',
       'email' => 'owner@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $owner->syncRoles(RoleName::SELLER);
     $otherSeller = User::create([
       'first_name' => 'Other',
       'last_name' => 'Seller',
       'email' => 'other@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $otherSeller->syncRoles(RoleName::SELLER);
     $product = $owner->products()->create([
       'title' => 'Private Product',
       'description' => 'Only its owner should be able to manage it.',

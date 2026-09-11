@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\User;
@@ -53,6 +53,7 @@ class StorefrontWebTest extends TestCase
       ->assertOk()
       ->assertSee('Wireless Headphones')
       ->assertSee(route('products.show', $matchingProduct), false)
+      ->assertSee('stretched-link', false)
       ->assertDontSee('Coffee Maker')
       ->assertDontSee('Wireless Mouse');
   }
@@ -212,12 +213,13 @@ class StorefrontWebTest extends TestCase
 
   private function createSeller(): User
   {
-    return User::create([
+    $seller = User::create([
       'first_name' => 'Storefront',
       'last_name' => 'Seller',
       'email' => 'storefront-seller@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+
+    return $seller->syncRoles(RoleName::SELLER);
   }
 }

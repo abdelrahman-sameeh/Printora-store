@@ -107,7 +107,7 @@
             <div class="col-12">
               <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
                 <label class="form-label fw-semibold mb-0">خصائص المنتج</label>
-                <button class="btn btn-outline-primary btn-sm" id="add-attribute" type="button">إضافة خاصية</button>
+                <button class="btn btn-outline-primary" id="add-attribute" type="button">إضافة خاصية</button>
               </div>
 
               <div class="d-grid gap-2" id="attributes-list" data-next-index="{{ $nextAttributeIndex }}">

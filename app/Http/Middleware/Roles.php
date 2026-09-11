@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,8 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Roles
 {
-    private static $allowed_roles = ['admin', 'user', 'seller', 'delivery'];
-
     /**
      * Handle an incoming request.
      *
@@ -26,19 +24,14 @@ class Roles
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        foreach ($selected_roles as $role) {
-            if (!in_array(strtolower($role), self::$allowed_roles)) {
-                return response()->json([
-                    "message" => "Invalid role {$role}"
-                ]);
-            }
+        $selectedRoles = array_map('strtolower', $selected_roles);
+        $allowedRoles = array_column(RoleName::cases(), 'value');
+
+        foreach ($selectedRoles as $role) {
+            abort_unless(in_array($role, $allowedRoles, true), 500, "Invalid role {$role}");
         }
 
-        $user_role_id = $user->role;
-        $user_role_name = UserRole::$roles[$user_role_id];
-        if (!in_array($user_role_name, $selected_roles)) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        abort_unless($user->hasAnyRole($selectedRoles), 403, 'Forbidden');
 
         return $next($request);
     }

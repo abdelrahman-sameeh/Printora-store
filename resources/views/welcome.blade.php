@@ -27,10 +27,10 @@
 
                 <div class="d-flex flex-wrap gap-3">
                     @auth
-                        <a class="btn btn-brand btn-lg px-4" href="{{ route('dashboard') }}">الذهاب إلى حسابي</a>
+                        <a class="btn btn-brand px-4" href="{{ route('dashboard') }}">الذهاب إلى حسابي</a>
                     @else
-                        <a class="btn btn-brand btn-lg px-4" href="{{ route('register') }}">ابدأ الآن</a>
-                        <a class="btn btn-outline-dark btn-lg px-4 rounded-4" href="{{ route('login') }}">لدي حساب</a>
+                        <a class="btn btn-brand px-4" href="{{ route('register') }}">ابدأ الآن</a>
+                        <a class="btn btn-outline-dark px-4" href="{{ route('login') }}">لدي حساب</a>
                     @endauth
                 </div>
             </div>
@@ -97,7 +97,7 @@
                 <div class="row g-4">
                     @foreach ($products as $product)
                         <div class="col-sm-6 col-lg-4 col-xl-3">
-                            <article class="dashboard-card card border-0 h-100 overflow-hidden">
+                            <article class="dashboard-card card border-0 h-100 overflow-hidden position-relative">
                                 <a href="{{ route('products.show', $product) }}">
                                     @if ($product->cover_image)
                                         <img class="w-100" style="height: 210px; object-fit: cover;"
@@ -115,13 +115,14 @@
                                         @endforeach
                                     </div>
                                     <h3 class="h5 fw-bold mb-2">
-                                        <a class="text-dark text-decoration-none" href="{{ route('products.show', $product) }}">
+                                        <a class="text-dark text-decoration-none stretched-link"
+                                            href="{{ route('products.show', $product) }}">
                                             {{ $product->title }}
                                         </a>
                                     </h3>
                                     <p class="text-muted-custom small mb-3">{{ Str::limit($product->description, 80) }}</p>
 
-                                    <div class="d-flex align-items-end justify-content-between gap-2 mt-auto">
+                                    <div class="d-flex align-items-end justify-content-between gap-2 mt-auto position-relative z-2">
                                         <div>
                                             @if ($product->discount_amount > 0)
                                                 <small class="text-muted-custom text-decoration-line-through d-block">
@@ -130,7 +131,7 @@
                                             @endif
                                             <strong class="text-brand">{{ number_format($product->price_after_discount, 2) }} جنيه</strong>
                                         </div>
-                                        <a class="btn btn-brand btn-sm" href="{{ route('products.show', $product) }}">عرض</a>
+                                        <a class="btn btn-brand" href="{{ route('products.show', $product) }}">عرض</a>
                                     </div>
                                 </div>
                             </article>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\RoleName;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,14 +19,19 @@ class RegisterTest extends TestCase
         'email' => 'test@test.com',
         'password' => 'Ec1234sasa@#',
         'password_confirmation' => 'Ec1234sasa@#',
-        'role' => 'user',
+        'role' => 'admin',
+        'role_ids' => [3],
     ];
 
     public function testCreateNewUser(): void
     {
         $response = $this->postJson($this->baseUrl, $this->data);
         $response->assertStatus(201)
-            ->assertJsonStructure(['success', 'user' => ['id']]);
+            ->assertJsonStructure(['success', 'user' => ['id', 'roles']]);
+
+        $user = User::findOrFail($response['user']['id']);
+        $this->assertTrue($user->hasRole(RoleName::USER));
+        $this->assertFalse($user->hasRole(RoleName::ADMIN));
     }
 
     function testInvalidEmail()

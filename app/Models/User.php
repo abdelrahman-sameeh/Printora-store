@@ -3,8 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\Cart\Cart;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,7 +20,6 @@ use App\Models\Coupon;
  * @property string $last_name
  * @property string $email
  * @property string|null $phone
- * @property int $role
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property mixed $password
  * @property string|null $remember_token
@@ -31,6 +31,8 @@ use App\Models\Coupon;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
  * @property-read int|null $products_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * 
@@ -57,10 +59,11 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
-        'role',
         'phone',
         'password',
     ];
+
+    protected $with = ['roles'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -82,6 +85,62 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected static function booted(): void
+    {
+        static::created(function (User $user) {
+            $user->assignRole(RoleName::USER);
+        });
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasRole(RoleName|string $role): bool
+    {
+        return $this->hasAnyRole([$role]);
+    }
+
+    /**
+     * @param array<int, RoleName|string> $roles
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        $roleNames = collect($roles)
+            ->map(fn(RoleName|string $role) => $role instanceof RoleName ? $role->value : strtolower($role));
+
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->contains(fn(Role $role) => $roleNames->contains($role->name));
+        }
+
+        return $this->roles()->whereIn('name', $roleNames)->exists();
+    }
+
+    public function assignRole(RoleName|string ...$roles): self
+    {
+        $roleNames = collect($roles)
+            ->map(fn(RoleName|string $role) => $role instanceof RoleName ? $role->value : strtolower($role));
+        $roleIds = Role::query()->whereIn('name', $roleNames)->pluck('id');
+
+        $this->roles()->syncWithoutDetaching($roleIds);
+        $this->unsetRelation('roles');
+
+        return $this;
+    }
+
+    public function syncRoles(RoleName|string ...$roles): self
+    {
+        $roleNames = collect($roles)
+            ->map(fn(RoleName|string $role) => $role instanceof RoleName ? $role->value : strtolower($role));
+        $roleIds = Role::query()->whereIn('name', $roleNames)->pluck('id');
+
+        $this->roles()->sync($roleIds);
+        $this->unsetRelation('roles');
+
+        return $this;
+    }
+
 
     public function products()
     {
@@ -91,7 +150,7 @@ class User extends Authenticatable
     public function coupons()
     {
         $query = $this->hasMany(Coupon::class, 'seller_id');
-        if ($this->role != UserRole::SELLER) {
+        if (!$this->hasRole(RoleName::SELLER)) {
             $query->whereRaw('1 = 0');
         }
         return $query;

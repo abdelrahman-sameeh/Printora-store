@@ -23,7 +23,6 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->index(["user_id", "is_default"]);
-            $table->index('user_id');
         });
     }
 

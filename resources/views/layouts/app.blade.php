@@ -7,10 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name'))</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {
@@ -18,12 +15,17 @@
             --brand-dark: #4033c7;
             --ink: #182230;
             --muted: #667085;
+            --brand-soft: #eeecff;
+            --danger: #d92d20;
+            --danger-dark: #b42318;
+            --danger-soft: #fee4e2;
+            --neutral-soft: #f2f4f7;
         }
 
         body {
             min-height: 100vh;
             color: var(--ink);
-            font-family: "Cairo", sans-serif;
+            font-family: "Readex Pro Variable", sans-serif;
             background:
                 radial-gradient(circle at 10% 10%, rgba(91, 76, 240, .14), transparent 32rem),
                 radial-gradient(circle at 90% 90%, rgba(15, 188, 150, .12), transparent 30rem),
@@ -32,7 +34,7 @@
 
         .navbar-brand {
             color: var(--ink);
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: -.04em;
         }
 
@@ -103,24 +105,122 @@
             box-shadow: 0 0 0 .25rem rgba(91, 76, 240, .12);
         }
 
-        .btn-brand {
+        .btn {
             display: inline-flex;
             min-height: 3.15rem;
-            color: #fff;
+            padding: .7rem 1rem;
             font-weight: 700;
-            border: 0;
+            font-size: .95rem;
+            line-height: 1.25;
             border-radius: .85rem;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-            box-shadow: 0 .75rem 1.5rem rgba(91, 76, 240, .22);
+            gap: .4rem;
+            box-shadow: 0 .35rem .85rem rgba(16, 24, 40, .08);
+            transition: color .2s ease, background-color .2s ease, border-color .2s ease,
+                box-shadow .2s ease, transform .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 .55rem 1rem rgba(16, 24, 40, .12);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 .2rem .5rem rgba(16, 24, 40, .08);
+        }
+
+        .btn:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 .25rem rgba(91, 76, 240, .18);
+        }
+
+        .btn:disabled,
+        .btn.disabled {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-brand,
+        .btn-primary {
+            color: #fff;
+            border-color: var(--brand);
+            background-color: var(--brand);
         }
 
         .btn-brand:hover,
-        .btn-brand:focus {
+        .btn-brand:focus,
+        .btn-primary:hover,
+        .btn-primary:focus {
             color: #fff;
-            transform: translateY(-1px);
-            background: linear-gradient(135deg, #5142e5, #3529b2);
+            border-color: var(--brand-dark);
+            background-color: var(--brand-dark);
+        }
+
+        .btn-outline-primary {
+            color: var(--brand-dark);
+            border-color: var(--brand-soft);
+            background-color: var(--brand-soft);
+        }
+
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus {
+            color: #fff;
+            border-color: var(--brand);
+            background-color: var(--brand);
+        }
+
+        .btn-danger {
+            color: #fff;
+            border-color: var(--danger);
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover,
+        .btn-danger:focus {
+            color: #fff;
+            border-color: var(--danger-dark);
+            background-color: var(--danger-dark);
+        }
+
+        .btn-outline-danger {
+            color: var(--danger-dark);
+            border-color: var(--danger-soft);
+            background-color: var(--danger-soft);
+        }
+
+        .btn-outline-danger:hover,
+        .btn-outline-danger:focus {
+            color: #fff;
+            border-color: var(--danger);
+            background-color: var(--danger);
+        }
+
+        .btn-light {
+            color: var(--ink);
+            border-color: #e4e7ec;
+            background-color: var(--neutral-soft);
+        }
+
+        .btn-light:hover,
+        .btn-light:focus {
+            color: var(--ink);
+            border-color: #d0d5dd;
+            background-color: #e4e7ec;
+        }
+
+        .btn-outline-dark {
+            color: #fff;
+            border-color: var(--ink);
+            background-color: var(--ink);
+        }
+
+        .btn-outline-dark:hover,
+        .btn-outline-dark:focus {
+            color: #fff;
+            border-color: #101828;
+            background-color: #101828;
         }
 
         .text-brand {
@@ -186,7 +286,6 @@
         @yield('content')
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Enums\RoleName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,12 +32,12 @@ class WebAuthTest extends TestCase
             'email' => 'ahmed@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-            'role' => 'user',
         ]);
 
         $response->assertRedirect('/home');
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', ['email' => 'ahmed@example.com']);
+        $this->assertTrue(User::whereEmail('ahmed@example.com')->firstOrFail()->hasRole(RoleName::USER));
     }
 
     public function test_user_can_login_and_logout_from_web(): void
@@ -46,7 +47,6 @@ class WebAuthTest extends TestCase
             'last_name' => 'Ali',
             'email' => 'ahmed@example.com',
             'password' => 'password123',
-            'role' => 0,
         ]);
 
         $this->post('/login', [

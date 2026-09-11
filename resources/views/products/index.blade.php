@@ -25,14 +25,15 @@
       <div class="row g-4">
         @foreach ($products as $product)
           <div class="col-md-6 col-xl-4">
-            <article class="dashboard-card card border-0 h-100 overflow-hidden">
+            <article class="dashboard-card card border-0 h-100 overflow-hidden position-relative">
               @if ($product->cover_image)
                 <img class="w-100" style="height: 190px; object-fit: cover;" src="{{ $product->cover_image_url }}"
                   alt="{{ $product->title }}">
               @endif
               <div class="card-body p-4">
                 <h2 class="h5 fw-bold mb-2">
-                  <a class="text-dark text-decoration-none" href="{{ route('seller.products.show', $product) }}">
+                  <a class="text-dark text-decoration-none stretched-link"
+                    href="{{ route('seller.products.show', $product) }}">
                     {{ $product->title }}
                   </a>
                 </h2>
@@ -53,17 +54,22 @@
                   <span class="text-muted-custom">المخزون: {{ $product->quantity }}</span>
                 </div>
 
-                <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
-                  <a class="btn btn-brand btn-sm flex-grow-1"
-                    href="{{ route('seller.products.show', $product) }}">عرض</a>
-                  <a class="btn btn-outline-primary btn-sm flex-grow-1"
-                    href="{{ route('seller.products.edit', $product) }}">تعديل</a>
-                  <form class="flex-grow-1" method="POST" action="{{ route('seller.products.destroy', $product) }}"
-                    onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-outline-danger btn-sm w-100" type="submit">حذف</button>
-                  </form>
+                <div class="row g-2 mt-4 pt-3 border-top position-relative z-2">
+                  <div class="col-4 d-grid">
+                    <a class="btn btn-brand w-100" href="{{ route('seller.products.show', $product) }}">عرض</a>
+                  </div>
+                  <div class="col-4 d-grid">
+                    <a class="btn btn-outline-primary d-flex align-items-center justify-content-center w-100"
+                      href="{{ route('seller.products.edit', $product) }}">تعديل</a>
+                  </div>
+                  <div class="col-4 d-grid">
+                    <form class="d-grid h-100" method="POST" action="{{ route('seller.products.destroy', $product) }}"
+                      onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">
+                      @csrf
+                      @method('DELETE')
+                      <button class="btn btn-outline-danger w-100 h-100" type="submit">حذف</button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </article>

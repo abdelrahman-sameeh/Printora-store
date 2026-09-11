@@ -165,7 +165,7 @@
                     <div class="row g-4">
                         @foreach ($products as $product)
                             <div class="col-md-6 col-xl-4">
-                                <article class="dashboard-card card border-0 h-100 overflow-hidden">
+                                <article class="dashboard-card card border-0 h-100 overflow-hidden position-relative">
                                     <a href="{{ route('products.show', $product) }}">
                                         @if ($product->cover_image)
                                             <img class="w-100" style="height: 210px; object-fit: cover;"
@@ -186,12 +186,12 @@
                                             @endif
                                         </div>
                                         <h2 class="h5 fw-bold mb-2">
-                                            <a class="text-dark text-decoration-none"
+                                            <a class="text-dark text-decoration-none stretched-link"
                                                 href="{{ route('products.show', $product) }}">{{ $product->title }}</a>
                                         </h2>
                                         <p class="text-muted-custom small mb-3">{{ Str::limit($product->description, 80) }}</p>
 
-                                        <div class="d-flex align-items-end justify-content-between gap-2 mt-auto">
+                                        <div class="d-flex align-items-end justify-content-between gap-2 mt-auto position-relative z-2">
                                             <div>
                                                 @if ($product->discount_amount > 0)
                                                     <small class="text-muted-custom text-decoration-line-through d-block">
@@ -202,7 +202,7 @@
                                                     {{ number_format($product->price_after_discount, 2) }} جنيه
                                                 </strong>
                                             </div>
-                                            <a class="btn btn-brand btn-sm" href="{{ route('products.show', $product) }}">عرض</a>
+                                            <a class="btn btn-brand" href="{{ route('products.show', $product) }}">عرض</a>
                                         </div>
                                     </div>
                                 </article>

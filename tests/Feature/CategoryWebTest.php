@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,8 +19,8 @@ class CategoryWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'seller-category@example.com',
       'password' => 'password123',
-      'role' => UserRole::SELLER,
     ]);
+    $seller->syncRoles(RoleName::SELLER);
 
     $this->actingAs($seller)
       ->get(route('admin.categories.index'))
@@ -34,8 +34,8 @@ class CategoryWebTest extends TestCase
       'last_name' => 'User',
       'email' => 'admin-category@example.com',
       'password' => 'password123',
-      'role' => UserRole::ADMIN,
     ]);
+    $admin->syncRoles(RoleName::ADMIN);
 
     $this->actingAs($admin)
       ->get(route('admin.categories.index'))
@@ -68,8 +68,8 @@ class CategoryWebTest extends TestCase
       'last_name' => 'Delete',
       'email' => 'admin-delete@example.com',
       'password' => 'password123',
-      'role' => UserRole::ADMIN,
     ]);
+    $admin->syncRoles(RoleName::ADMIN);
     $category = Category::create(['title' => 'Fashion']);
     $subCategory = $category->sub_categories()->create(['title' => 'Shoes']);
 

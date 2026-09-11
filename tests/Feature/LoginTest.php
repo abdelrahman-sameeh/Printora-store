@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,15 +13,20 @@ class LoginTest extends TestCase
 
     private string $loginUrl = '/api/auth/login';
 
-    private function createUser(array $overrides = []): User
+    private function createUser(array $overrides = [], RoleName ...$roles): User
     {
-        return User::create(array_merge([
+        $user = User::create(array_merge([
             'first_name' => 'Test',
             'last_name'  => 'User',
             'email'      => 'test@test.com',
             'password'   => 'Ec1234sasa@#',
-            'role'       => UserRole::USER,
         ], $overrides));
+
+        if ($roles !== []) {
+            $user->syncRoles(...$roles);
+        }
+
+        return $user;
     }
 
     // ─── Success ──────────────────────────────────────────────────────────────
@@ -39,7 +44,7 @@ class LoginTest extends TestCase
             ->assertJsonStructure([
                 'access_token',
                 'token_type',
-                'user' => ['id', 'first_name', 'last_name', 'email'],
+                'user' => ['id', 'first_name', 'last_name', 'email', 'roles'],
             ])
             ->assertJson(['token_type' => 'Bearer']);
     }
@@ -164,7 +169,7 @@ class LoginTest extends TestCase
 
     public function test_seller_can_login(): void
     {
-        $this->createUser(['email' => 'seller@test.com', 'role' => UserRole::SELLER]);
+        $this->createUser(['email' => 'seller@test.com'], RoleName::SELLER);
 
         $response = $this->postJson($this->loginUrl, [
             'email'    => 'seller@test.com',
@@ -177,7 +182,7 @@ class LoginTest extends TestCase
 
     public function test_admin_can_login(): void
     {
-        $this->createUser(['email' => 'admin@test.com', 'role' => UserRole::ADMIN]);
+        $this->createUser(['email' => 'admin@test.com'], RoleName::ADMIN);
 
         $response = $this->postJson($this->loginUrl, [
             'email'    => 'admin@test.com',

@@ -3,15 +3,6 @@
 @section('title', 'حسابي | Printora')
 
 @section('content')
-    @php
-        $roleName = match ($user->role) {
-            \App\Constants\UserRole::ADMIN => 'مدير',
-            \App\Constants\UserRole::SELLER => 'بائع',
-            \App\Constants\UserRole::DELIVERY => 'مندوب توصيل',
-            default => 'عميل',
-        };
-    @endphp
-
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-9">
@@ -33,7 +24,7 @@
 
                         <hr class="my-5">
 
-                        @if ($user->role === \App\Constants\UserRole::SELLER)
+                        @if ($user->hasRole(\App\Enums\RoleName::SELLER))
                             <div
                                 class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
                                 <div>
@@ -44,14 +35,19 @@
                             </div>
                         @endif
 
-                        @if ($user->role === \App\Constants\UserRole::ADMIN)
+                        @if ($user->hasRole(\App\Enums\RoleName::ADMIN))
                             <div
                                 class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
                                 <div>
                                     <h2 class="h5 fw-bold mb-1">إدارة كتالوج المتجر</h2>
                                     <p class="text-muted-custom mb-0">أنشئ التصنيفات التي سيستخدمها البائعون في منتجاتهم.</p>
                                 </div>
-                                <a class="btn btn-brand px-4" href="{{ route('admin.categories.index') }}">إدارة التصنيفات</a>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a class="btn btn-outline-primary px-4" href="{{ route('admin.users.roles.index') }}">
+                                        إدارة الصلاحيات
+                                    </a>
+                                    <a class="btn btn-brand px-4" href="{{ route('admin.categories.index') }}">إدارة التصنيفات</a>
+                                </div>
                             </div>
                         @endif
 
@@ -70,8 +66,12 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="rounded-4 bg-light p-3 h-100">
-                                    <small class="text-muted-custom d-block mb-1">نوع الحساب</small>
-                                    <strong>{{ $roleName }}</strong>
+                                    <small class="text-muted-custom d-block mb-2">صلاحيات الحساب</small>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach ($user->roles as $role)
+                                            <span class="badge text-bg-primary">{{ $role->label }}</span>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\UserRole;
+use App\Enums\RoleName;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,8 +35,8 @@ class CategoryTest extends TestCase
             'last_name'  => 'Test',
             'email'      => 'admin@test.com',
             'password'   => 'Ec1234sasa@#',
-            'role'       => UserRole::ADMIN,
         ]);
+        $admin->syncRoles(RoleName::ADMIN);
 
         // actingAs = ابعت الـ request كأنك اليوزر ده
         $response = $this->actingAs($admin)->postJson('/api/categories', [

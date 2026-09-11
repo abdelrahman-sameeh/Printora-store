@@ -90,7 +90,7 @@
                           action="{{ route('admin.sub-categories.destroy', $category->sub_categories->first()) }}">
                           @csrf
                           @method('DELETE')
-                          <button class="btn btn-sm btn-outline-danger" type="submit">حذف الفرعي</button>
+                          <button class="btn btn-outline-danger" type="submit">حذف الفرعي</button>
                         </form>
                       </td>
                     @else
@@ -105,7 +105,7 @@
                         <form method="POST" action="{{ route('admin.sub-categories.destroy', $subCategory) }}">
                           @csrf
                           @method('DELETE')
-                          <button class="btn btn-sm btn-outline-danger" type="submit">حذف الفرعي</button>
+                          <button class="btn btn-outline-danger" type="submit">حذف الفرعي</button>
                         </form>
                       </td>
                     </tr>
@@ -115,7 +115,7 @@
                       <form method="POST" action="{{ route('admin.categories.destroy', $category) }}">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-sm btn-danger" type="submit">حذف التصنيف بالكامل</button>
+                        <button class="btn btn-danger" type="submit">حذف التصنيف بالكامل</button>
                       </form>
                     </td>
                   </tr>

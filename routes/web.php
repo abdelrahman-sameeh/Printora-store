@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthWebController;
+use App\Http\Controllers\AdminUserRoleController;
 use App\Http\Controllers\CategoryWebController;
 use App\Http\Controllers\ProductWebController;
 use App\Http\Controllers\StorefrontController;
@@ -43,6 +44,8 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('roles:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/users/roles', [AdminUserRoleController::class, 'index'])->name('users.roles.index');
+        Route::put('/users/{user}/roles', [AdminUserRoleController::class, 'update'])->name('users.roles.update');
         Route::get('/categories', [CategoryWebController::class, 'index'])->name('categories.index');
         Route::post('/categories', [CategoryWebController::class, 'store'])->name('categories.store');
         Route::delete('/categories/{category}', [CategoryWebController::class, 'destroy'])->name('categories.destroy');
