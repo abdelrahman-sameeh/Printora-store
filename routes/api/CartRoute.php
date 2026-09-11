@@ -1,21 +1,15 @@
 <?php
 
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartApiController;
 use Illuminate\Support\Facades\Route;
 
-
-
 Route::middleware(['auth:sanctum', 'roles:user'])->group(function () {
-
-  Route::get('cart', [CartController::class, 'index']);
-  Route::post('cart/items', [CartController::class, 'add_items_to_cart']);
-  Route::put('cart/items/{id}', [CartController::class, 'update_cart_item_quantity']);
-  Route::delete('cart/items/{id}', [CartController::class, 'delete_cart_item']);
-  Route::delete('cart', [CartController::class, 'delete_cart']);
-  Route::post('cart/coupon', [CartController::class, 'apply_coupon']);
-  Route::delete('cart/coupon', [CartController::class, 'remove_coupon']);
-  Route::post('cart/validate', [CartController::class, 'validateCart']);
-
+    Route::get('cart', [CartApiController::class, 'index']);
+    Route::post('cart/items', [CartApiController::class, 'addItems']);
+    Route::put('cart/items/{item}', [CartApiController::class, 'updateItem']);
+    Route::delete('cart/items/{item}', [CartApiController::class, 'removeItem']);
+    Route::delete('cart', [CartApiController::class, 'clear']);
+    Route::post('cart/coupon', [CartApiController::class, 'applyCoupon']);
+    Route::delete('cart/coupon', [CartApiController::class, 'removeCoupon']);
+    Route::post('cart/validate', [CartApiController::class, 'validateCart']);
 });
-
-

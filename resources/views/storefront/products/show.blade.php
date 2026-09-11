@@ -60,6 +60,22 @@
                                 <span class="badge text-bg-secondary">نفد المخزون</span>
                             @endif
                         </div>
+
+                        @auth
+                            @if (auth()->user()->hasRole(\App\Enums\RoleName::USER) && $product->quantity > 0)
+                                <form class="d-flex gap-2 mt-3" method="POST" action="{{ route('cart.items.store') }}">
+                                    @csrf
+                                    <input name="product_id" type="hidden" value="{{ $product->id }}">
+                                    <input class="form-control" name="quantity" type="number" min="1"
+                                        max="{{ $product->quantity }}" value="1" required>
+                                    <button class="btn btn-brand flex-shrink-0" type="submit">أضف للسلة</button>
+                                </form>
+                            @endif
+                        @else
+                            @if ($product->quantity > 0)
+                                <a class="btn btn-brand w-100 mt-3" href="{{ route('login') }}">سجل الدخول للإضافة للسلة</a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
 

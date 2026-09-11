@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon query()
@@ -30,25 +29,41 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon wherePercentage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereUsedCount($value)
+ *
  * @mixin \Eloquent
  */
 class Coupon extends Model
 {
-  public $table = 'coupons';
+    public $table = 'coupons';
 
-  protected $fillable = [
-    'code',
-    'percentage',
-    'expire_date',
-    'max_usage',
-    'used_count',
-    'seller_id',
-    'is_active',
-  ];
+    protected $fillable = [
+        'code',
+        'percentage',
+        'expire_date',
+        'max_usage',
+        'used_count',
+        'seller_id',
+        'is_active',
+    ];
 
-  public function is_invalid()
-  {
-    return Carbon::parse($this->expire_date)->lte(Carbon::now()) || !$this->is_active || $this->used_count >= $this->max_usage;
-  }
+    protected $casts = [
+        'percentage' => 'float',
+        'expire_date' => 'date:Y-m-d',
+        'is_active' => 'boolean',
+    ];
 
+    public function isExpired(): bool
+    {
+        return $this->expire_date->lt(today());
+    }
+
+    public function isExhausted(): bool
+    {
+        return $this->used_count >= $this->max_usage;
+    }
+
+    public function is_invalid()
+    {
+        return $this->isExpired() || ! $this->is_active || $this->isExhausted();
+    }
 }

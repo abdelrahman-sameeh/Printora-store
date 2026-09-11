@@ -31,7 +31,11 @@
                                     <h2 class="h5 fw-bold mb-1">إدارة المنتجات</h2>
                                     <p class="text-muted-custom mb-0">أضف منتجاتك وتابع المنتجات المنشورة.</p>
                                 </div>
-                                <a class="btn btn-brand px-4" href="{{ route('seller.products.index') }}">منتجاتي</a>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a class="btn btn-brand px-4" href="{{ route('seller.products.index') }}">منتجاتي</a>
+                                    <a class="btn btn-outline-primary px-4"
+                                        href="{{ route('seller.coupons.index') }}">كوبوناتي</a>
+                                </div>
                             </div>
                         @endif
 

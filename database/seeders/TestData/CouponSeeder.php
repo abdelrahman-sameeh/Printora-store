@@ -13,7 +13,7 @@ class CouponSeeder extends Seeder
         $seller = User::query()->where('email', 'printora.shop0@gmail.com')->firstOrFail();
 
         Coupon::create([
-            'code' => 'خصم_الموضة_١٠',
+            'code' => 'coupon_10',
             'percentage' => 10,
             'expire_date' => now()->addMonths(3)->toDateString(),
             'max_usage' => 100,
@@ -23,7 +23,7 @@ class CouponSeeder extends Seeder
         ]);
 
         Coupon::create([
-            'code' => 'خصم_منتهي_٢٥',
+            'code' => 'coupon_25',
             'percentage' => 25,
             'expire_date' => now()->subDays(10)->toDateString(),
             'max_usage' => 10,

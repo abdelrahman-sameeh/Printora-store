@@ -269,6 +269,9 @@
 
             <div class="d-flex align-items-center gap-2">
                 @auth
+                    @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
+                        <a class="btn btn-outline-primary px-3" href="{{ route('cart.index') }}">السلة</a>
+                    @endif
                     <a class="btn btn-light px-3" href="{{ route('dashboard') }}">حسابي</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

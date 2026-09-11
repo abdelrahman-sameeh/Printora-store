@@ -1,18 +1,13 @@
 <?php
 
-use App\Http\Controllers\CouponController;
+use App\Http\Controllers\CouponApiController;
 use Illuminate\Support\Facades\Route;
 
-
-
-
-Route::middleware(['auth:sanctum', "roles:seller"])->group(function () {
-  Route::post("coupons", [CouponController::class, 'create']);
-  Route::get("coupons", [CouponController::class, 'find']);
-  Route::put("coupons/{id}", [CouponController::class, 'update']);
-  Route::get("coupons/{coupon}", [CouponController::class, 'find_one']);
-  Route::delete("coupons/{coupon}", [CouponController::class, 'delete_one']);
-  Route::delete("coupons", [CouponController::class, 'delete_all']);
+Route::middleware(['auth:sanctum', 'roles:seller'])->group(function () {
+    Route::get('coupons', [CouponApiController::class, 'index']);
+    Route::post('coupons', [CouponApiController::class, 'store']);
+    Route::delete('coupons', [CouponApiController::class, 'destroyAll']);
+    Route::get('coupons/{coupon}', [CouponApiController::class, 'show']);
+    Route::put('coupons/{coupon}', [CouponApiController::class, 'update']);
+    Route::delete('coupons/{coupon}', [CouponApiController::class, 'destroy']);
 });
-
-
