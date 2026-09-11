@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\Enums\RoleName;
 use App\Models\User;
@@ -17,9 +17,9 @@ class LoginTest extends TestCase
     {
         $user = User::create(array_merge([
             'first_name' => 'Test',
-            'last_name'  => 'User',
-            'email'      => 'test@test.com',
-            'password'   => 'Ec1234sasa@#',
+            'last_name' => 'User',
+            'email' => 'test@test.com',
+            'password' => 'Ec1234sasa@#',
         ], $overrides));
 
         if ($roles !== []) {
@@ -36,7 +36,7 @@ class LoginTest extends TestCase
         $this->createUser();
 
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'test@test.com',
+            'email' => 'test@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 
@@ -53,12 +53,12 @@ class LoginTest extends TestCase
     {
         $this->createUser([
             'first_name' => 'Ahmed',
-            'last_name'  => 'Ali',
-            'email'      => 'ahmed@test.com',
+            'last_name' => 'Ali',
+            'email' => 'ahmed@test.com',
         ]);
 
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'ahmed@test.com',
+            'email' => 'ahmed@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 
@@ -66,8 +66,8 @@ class LoginTest extends TestCase
             ->assertJson([
                 'user' => [
                     'first_name' => 'Ahmed',
-                    'last_name'  => 'Ali',
-                    'email'      => 'ahmed@test.com',
+                    'last_name' => 'Ali',
+                    'email' => 'ahmed@test.com',
                 ],
             ]);
     }
@@ -77,13 +77,13 @@ class LoginTest extends TestCase
         $user = $this->createUser();
 
         $this->postJson($this->loginUrl, [
-            'email'    => 'test@test.com',
+            'email' => 'test@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 
         $this->assertDatabaseCount('personal_access_tokens', 1);
         $this->assertDatabaseHas('personal_access_tokens', [
-            'tokenable_id'   => $user->id,
+            'tokenable_id' => $user->id,
             'tokenable_type' => User::class,
         ]);
     }
@@ -95,7 +95,7 @@ class LoginTest extends TestCase
         $this->createUser();
 
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'test@test.com',
+            'email' => 'test@test.com',
             'password' => 'wrong_password',
         ]);
 
@@ -106,7 +106,7 @@ class LoginTest extends TestCase
     public function test_login_fails_with_non_existing_email(): void
     {
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'notexist@test.com',
+            'email' => 'notexist@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 
@@ -138,7 +138,7 @@ class LoginTest extends TestCase
     public function test_login_fails_with_invalid_email_format(): void
     {
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'not-an-email',
+            'email' => 'not-an-email',
             'password' => 'Ec1234sasa@#',
         ]);
 
@@ -149,7 +149,7 @@ class LoginTest extends TestCase
     public function test_login_fails_with_short_password(): void
     {
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'test@test.com',
+            'email' => 'test@test.com',
             'password' => '12345',
         ]);
 
@@ -172,7 +172,7 @@ class LoginTest extends TestCase
         $this->createUser(['email' => 'seller@test.com'], RoleName::SELLER);
 
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'seller@test.com',
+            'email' => 'seller@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 
@@ -185,7 +185,7 @@ class LoginTest extends TestCase
         $this->createUser(['email' => 'admin@test.com'], RoleName::ADMIN);
 
         $response = $this->postJson($this->loginUrl, [
-            'email'    => 'admin@test.com',
+            'email' => 'admin@test.com',
             'password' => 'Ec1234sasa@#',
         ]);
 

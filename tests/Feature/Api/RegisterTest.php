@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\Enums\RoleName;
 use App\Models\User;
@@ -23,7 +23,7 @@ class RegisterTest extends TestCase
         'role_ids' => [3],
     ];
 
-    public function testCreateNewUser(): void
+    public function test_create_new_user(): void
     {
         $response = $this->postJson($this->baseUrl, $this->data);
         $response->assertStatus(201)
@@ -34,7 +34,7 @@ class RegisterTest extends TestCase
         $this->assertFalse($user->hasRole(RoleName::ADMIN));
     }
 
-    function testInvalidEmail()
+    public function test_invalid_email()
     {
         $data = [
             ...$this->data,
@@ -45,7 +45,7 @@ class RegisterTest extends TestCase
             ->assertJsonStructure(['errors' => ['email']]);
     }
 
-    function testInvalidPassword()
+    public function test_invalid_password()
     {
         $data = [...$this->data, 'password' => '1'];
         $response = $this->postJson($this->baseUrl, $data);
@@ -53,7 +53,7 @@ class RegisterTest extends TestCase
             ->assertJsonStructure(['errors' => ['password']]);
     }
 
-    function testPasswordConfirmMismatch()
+    public function test_password_confirm_mismatch()
     {
         $data = [...$this->data, 'password_confirmation' => 'testpass'];
         $response = $this->postJson($this->baseUrl, $data);
@@ -62,7 +62,8 @@ class RegisterTest extends TestCase
 
     }
 
-    function testPasswordIsHashed(){
+    public function test_password_is_hashed()
+    {
         $response = $this->postJson($this->baseUrl, $this->data);
         $user = User::find($response['user']['id']);
         $response->assertStatus(201);
@@ -70,5 +71,4 @@ class RegisterTest extends TestCase
         $this->assertTrue(password_verify($this->data['password'], $user->password));
 
     }
-
 }

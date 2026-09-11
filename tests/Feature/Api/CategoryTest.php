@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\Enums\RoleName;
 use App\Models\Category;
@@ -32,9 +32,9 @@ class CategoryTest extends TestCase
         // الـ endpoint ده محتاج أدمن متسجل
         $admin = User::create([
             'first_name' => 'Admin',
-            'last_name'  => 'Test',
-            'email'      => 'admin@test.com',
-            'password'   => 'Ec1234sasa@#',
+            'last_name' => 'Test',
+            'email' => 'admin@test.com',
+            'password' => 'Ec1234sasa@#',
         ]);
         $admin->syncRoles(RoleName::ADMIN);
 

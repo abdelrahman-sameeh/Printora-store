@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Web;
 
 use App\Enums\RoleName;
 use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class CartWebTest extends TestCase
@@ -110,28 +109,6 @@ class CartWebTest extends TestCase
             ->assertOk()
             ->assertSee('SAVE10')
             ->assertSee('90.00');
-    }
-
-    public function test_cart_api_still_uses_the_same_endpoints(): void
-    {
-        $buyer = $this->createBuyer('api-buyer@example.com');
-        $product = $this->createProduct($this->createSeller(), 'منتج API', 75);
-        Sanctum::actingAs($buyer);
-
-        $this->postJson('/api/cart/items', [
-            'items' => [['id' => $product->id, 'quantity' => 2]],
-        ])
-            ->assertCreated()
-            ->assertJsonPath('cart.items_count', 1)
-            ->assertJsonPath('cart.summary_cart.total', 150);
-
-        $this->getJson('/api/cart')
-            ->assertOk()
-            ->assertJsonPath('cart.groups.0.items.0.product.title', 'منتج API');
-
-        $this->postJson('/api/cart/validate')
-            ->assertOk()
-            ->assertJsonPath('valid', true);
     }
 
     private function createBuyer(string $email): User

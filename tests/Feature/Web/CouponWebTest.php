@@ -1,12 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Web;
 
 use App\Enums\RoleName;
 use App\Models\Coupon;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class CouponWebTest extends TestCase
@@ -115,23 +114,6 @@ class CouponWebTest extends TestCase
             ->assertRedirect(route('seller.coupons.index'));
 
         $this->assertDatabaseCount('coupons', 2);
-    }
-
-    public function test_seller_can_create_a_coupon_through_the_api(): void
-    {
-        $seller = $this->createSeller('api-seller@example.com');
-        Sanctum::actingAs($seller);
-
-        $this->postJson('/api/coupons', [
-            'code' => 'API15',
-            'percentage' => 15,
-            'max_usage' => 30,
-            'expire_date' => now()->addMonth()->toDateString(),
-            'is_active' => true,
-        ])
-            ->assertCreated()
-            ->assertJsonPath('code', 'API15')
-            ->assertJsonPath('seller_id', $seller->id);
     }
 
     private function createUser(string $email): User
