@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AdminUserRoleController;
-use App\Http\Controllers\CategoryWebController;
+use App\Http\Controllers\Web\AdminUserRoleController;
+use App\Http\Controllers\Web\CategoryWebController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'roles:admin'])

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CartWebController;
+use App\Http\Controllers\Web\CartWebController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'roles:user'])->group(function () {

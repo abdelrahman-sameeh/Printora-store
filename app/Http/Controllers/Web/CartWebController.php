@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;

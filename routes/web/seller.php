@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\CouponWebController;
-use App\Http\Controllers\ProductWebController;
+use App\Http\Controllers\Web\CouponWebController;
+use App\Http\Controllers\Web\ProductWebController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'roles:seller'])

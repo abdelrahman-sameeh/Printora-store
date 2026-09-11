@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CouponApiController;
+use App\Http\Controllers\Api\CouponApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'roles:seller'])->group(function () {

@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
-
 
 // Customer
 Route::middleware(['auth:sanctum', 'roles:user'])->group(function () {

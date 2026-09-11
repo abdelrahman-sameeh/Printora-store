@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Coupon\StoreCouponRequest;
 use App\Http\Requests\Coupon\UpdateCouponRequest;
 use App\Models\Coupon;

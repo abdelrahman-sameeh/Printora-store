@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\StorefrontController;
+use App\Http\Controllers\Web\StorefrontController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');

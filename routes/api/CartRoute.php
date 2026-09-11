@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CartApiController;
+use App\Http\Controllers\Api\CartApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'roles:user'])->group(function () {

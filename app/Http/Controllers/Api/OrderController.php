@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Cart\Cart;
-use App\Models\Cart\CartCoupon;
 use App\Models\Order\Order;
 use App\Models\Order\OrderItem;
 use App\Models\Order\OrderItemPicture;
 use App\Models\Order\SubOrder;
-use App\Models\Product;
 use DB;
 use Illuminate\Http\Request;
 
@@ -47,15 +46,15 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'phone'          => 'required|string|max:15',
-            'address_id'     => 'nullable|exists:addresses,id',
+            'phone' => 'required|string|max:15',
+            'address_id' => 'nullable|exists:addresses,id',
             'payment_method' => 'required|in:cash,card,wallet',
         ]);
 
         $user = $request->user();
         $cart = $user->cart;
 
-        abort_if(!$cart || $cart->items()->count() === 0, 400, 'Cart is empty.');
+        abort_if(! $cart || $cart->items()->count() === 0, 400, 'Cart is empty.');
 
         // تحميل كل الـ items مع المنتجات
         $cart->load('items.product', 'coupons.coupon');
@@ -63,7 +62,7 @@ class OrderController extends Controller
         // التحقق من الـ stock
         foreach ($cart->items as $item) {
             $product = $item->product;
-            abort_if(!$product || !$product->is_active, 422, "Product '{$item->product_id}' is unavailable.");
+            abort_if(! $product || ! $product->is_active, 422, "Product '{$item->product_id}' is unavailable.");
             abort_if($product->quantity < $item->quantity, 422, "Insufficient stock for '{$product->title}'.");
         }
 
@@ -80,7 +79,7 @@ class OrderController extends Controller
             $couponsBySeller = [];
             foreach ($cart->coupons as $cartCoupon) {
                 $coupon = $cartCoupon->coupon;
-                if ($coupon && !$coupon->is_invalid()) {
+                if ($coupon && ! $coupon->is_invalid()) {
                     $couponsBySeller[$coupon->seller_id] = $coupon;
                 }
             }
@@ -97,15 +96,15 @@ class OrderController extends Controller
 
                 $discount = 0;
                 if (isset($couponsBySeller[$sellerId])) {
-                    $coupon   = $couponsBySeller[$sellerId];
+                    $coupon = $couponsBySeller[$sellerId];
                     $discount = round($subtotal * ($coupon->percentage / 100), 2);
                 }
 
                 $subOrdersData[$sellerId] = [
-                    'items'     => $items,
-                    'subtotal'  => $subtotal,
-                    'discount'  => $discount,
-                    'total'     => $subtotal - $discount,
+                    'items' => $items,
+                    'subtotal' => $subtotal,
+                    'discount' => $discount,
+                    'total' => $subtotal - $discount,
                 ];
 
                 $cartSubtotal += $subtotal;
@@ -114,13 +113,13 @@ class OrderController extends Controller
 
             // إنشاء الـ Order الرئيسي
             $order = Order::create([
-                'user_id'        => $user->id,
-                'subtotal'       => $cartSubtotal,
-                'discount'       => $cartDiscount,
-                'total_price'    => $cartSubtotal - $cartDiscount,
-                'phone'          => $validated['phone'],
-                'address_id'     => $validated['address_id'] ?? null,
-                'status'         => 'pending',
+                'user_id' => $user->id,
+                'subtotal' => $cartSubtotal,
+                'discount' => $cartDiscount,
+                'total_price' => $cartSubtotal - $cartDiscount,
+                'phone' => $validated['phone'],
+                'address_id' => $validated['address_id'] ?? null,
+                'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => $validated['payment_method'],
             ]);
@@ -128,26 +127,26 @@ class OrderController extends Controller
             // إنشاء SubOrder لكل seller
             foreach ($subOrdersData as $sellerId => $data) {
                 $subOrder = SubOrder::create([
-                    'order_id'    => $order->id,
-                    'seller_id'   => $sellerId,
-                    'subtotal'    => $data['subtotal'],
-                    'discount'    => $data['discount'],
+                    'order_id' => $order->id,
+                    'seller_id' => $sellerId,
+                    'subtotal' => $data['subtotal'],
+                    'discount' => $data['discount'],
                     'total_price' => $data['total'],
-                    'status'      => 'pending',
+                    'status' => 'pending',
                 ]);
 
                 // إنشاء OrderItems كـ snapshot
                 foreach ($data['items'] as $item) {
-                    $product   = $item->product;
+                    $product = $item->product;
                     $orderItem = OrderItem::create([
-                        'sub_order_id'        => $subOrder->id,
-                        'product_id'          => $product->id,
-                        'title'               => $product->title,
-                        'slug'                => $product->slug,
-                        'description'         => $product->description,
-                        'cover_image'         => $product->cover_image,
-                        'price_at_purchase'   => $product->price,
-                        'quantity'            => $item->quantity,
+                        'sub_order_id' => $subOrder->id,
+                        'product_id' => $product->id,
+                        'title' => $product->title,
+                        'slug' => $product->slug,
+                        'description' => $product->description,
+                        'cover_image' => $product->cover_image,
+                        'price_at_purchase' => $product->price,
+                        'quantity' => $item->quantity,
                         'created_at_snapshot' => $product->created_at,
                     ]);
 
@@ -155,7 +154,7 @@ class OrderController extends Controller
                     foreach ($product->pictures as $pic) {
                         OrderItemPicture::create([
                             'order_item_id' => $orderItem->id,
-                            'image_path'    => $pic->picture,
+                            'image_path' => $pic->picture,
                         ]);
                     }
 
