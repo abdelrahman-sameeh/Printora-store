@@ -27,10 +27,10 @@
                     <div class="row g-3 mt-1">
                         @foreach ($product->pictures as $picture)
                             <div class="col-6 col-md-4">
-                                <a class="d-block dashboard-card card border-0 overflow-hidden"
-                                    href="{{ $picture->picture_url }}" target="_blank" rel="noopener">
-                                    <img class="w-100" style="height: 150px; object-fit: cover;"
-                                        src="{{ $picture->picture_url }}" alt="صورة إضافية لـ {{ $product->title }}">
+                                <a class="d-block dashboard-card card border-0 overflow-hidden" href="{{ $picture->picture_url }}"
+                                    target="_blank" rel="noopener">
+                                    <img class="w-100" style="height: 150px; object-fit: cover;" src="{{ $picture->picture_url }}"
+                                        alt="صورة إضافية لـ {{ $product->title }}">
                                 </a>
                             </div>
                         @endforeach
@@ -42,7 +42,8 @@
                 <div class="dashboard-card card border-0 mb-4">
                     <div class="card-body p-4">
                         @if ($product->discount_amount > 0)
-                            <span class="badge text-bg-danger mb-2">خصم {{ number_format($product->discount_amount, 2) }} جنيه</span>
+                            <span class="badge text-bg-danger mb-2">خصم {{ number_format($product->discount_amount, 2) }}
+                                جنيه</span>
                             <span class="text-muted-custom text-decoration-line-through d-block">
                                 {{ number_format($product->price, 2) }} جنيه
                             </span>

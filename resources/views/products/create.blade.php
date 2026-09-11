@@ -96,8 +96,7 @@
                 @forelse (old('attributes', []) as $index => $attribute)
                   <div class="row g-2 align-items-start product-attribute-row">
                     <div class="col-md-5">
-                      <input
-                        class="form-control @error("attributes.$index.key") is-invalid @enderror"
+                      <input class="form-control @error("attributes.$index.key") is-invalid @enderror"
                         name="attributes[{{ $index }}][key]" type="text" value="{{ $attribute['key'] ?? '' }}"
                         placeholder="الخاصية، مثل اللون" required>
                       @error("attributes.$index.key")
@@ -105,8 +104,7 @@
                       @enderror
                     </div>
                     <div class="col-md-5">
-                      <input
-                        class="form-control @error("attributes.$index.value") is-invalid @enderror"
+                      <input class="form-control @error("attributes.$index.value") is-invalid @enderror"
                         name="attributes[{{ $index }}][value]" type="text" value="{{ $attribute['value'] ?? '' }}"
                         placeholder="القيمة، مثل أسود" required>
                       @error("attributes.$index.value")
@@ -165,20 +163,20 @@
 
         document.getElementById('attributes-empty-state')?.remove();
         attributesList.insertAdjacentHTML('beforeend', `
-          <div class="row g-2 align-items-start product-attribute-row">
-            <div class="col-md-5">
-              <input class="form-control" name="attributes[${index}][key]" type="text"
-                placeholder="الخاصية، مثل اللون" required>
+            <div class="row g-2 align-items-start product-attribute-row">
+              <div class="col-md-5">
+                <input class="form-control" name="attributes[${index}][key]" type="text"
+                  placeholder="الخاصية، مثل اللون" required>
+              </div>
+              <div class="col-md-5">
+                <input class="form-control" name="attributes[${index}][value]" type="text"
+                  placeholder="القيمة، مثل أسود" required>
+              </div>
+              <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>
+              </div>
             </div>
-            <div class="col-md-5">
-              <input class="form-control" name="attributes[${index}][value]" type="text"
-                placeholder="القيمة، مثل أسود" required>
-            </div>
-            <div class="col-md-2 d-grid">
-              <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>
-            </div>
-          </div>
-        `);
+          `);
 
         attributesList.querySelector('.product-attribute-row:last-child input')?.focus();
       });

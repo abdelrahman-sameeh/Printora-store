@@ -46,7 +46,8 @@
                                     <a class="btn btn-outline-primary px-4" href="{{ route('admin.users.roles.index') }}">
                                         إدارة الصلاحيات
                                     </a>
-                                    <a class="btn btn-brand px-4" href="{{ route('admin.categories.index') }}">إدارة التصنيفات</a>
+                                    <a class="btn btn-brand px-4" href="{{ route('admin.categories.index') }}">إدارة
+                                        التصنيفات</a>
                                 </div>
                             </div>
                         @endif

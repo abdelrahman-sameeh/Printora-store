@@ -129,7 +129,8 @@
                                                     {{ number_format($product->price, 2) }} جنيه
                                                 </small>
                                             @endif
-                                            <strong class="text-brand">{{ number_format($product->price_after_discount, 2) }} جنيه</strong>
+                                            <strong class="text-brand">{{ number_format($product->price_after_discount, 2) }}
+                                                جنيه</strong>
                                         </div>
                                         <a class="btn btn-brand" href="{{ route('products.show', $product) }}">عرض</a>
                                     </div>

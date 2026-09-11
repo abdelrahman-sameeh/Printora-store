@@ -6,8 +6,8 @@
   @php
     $selectedSubCategories = old('sub_categories', $product->sub_categories->pluck('id')->all());
     $attributeRows = old('attributes', $product->attributes->map(fn($attribute) => [
-        'key' => $attribute->key,
-        'value' => $attribute->value,
+      'key' => $attribute->key,
+      'value' => $attribute->value,
     ])->all());
     $nextAttributeIndex = empty($attributeRows) ? 0 : max(array_keys($attributeRows)) + 1;
   @endphp
@@ -175,20 +175,20 @@
         document.getElementById('attributes-empty-state')?.remove();
 
         attributesList.insertAdjacentHTML('beforeend', `
-          <div class="row g-2 align-items-start product-attribute-row">
-            <div class="col-md-5">
-              <input class="form-control" name="attributes[${index}][key]" type="text"
-                placeholder="الخاصية، مثل اللون" required>
+            <div class="row g-2 align-items-start product-attribute-row">
+              <div class="col-md-5">
+                <input class="form-control" name="attributes[${index}][key]" type="text"
+                  placeholder="الخاصية، مثل اللون" required>
+              </div>
+              <div class="col-md-5">
+                <input class="form-control" name="attributes[${index}][value]" type="text"
+                  placeholder="القيمة، مثل أسود" required>
+              </div>
+              <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>
+              </div>
             </div>
-            <div class="col-md-5">
-              <input class="form-control" name="attributes[${index}][value]" type="text"
-                placeholder="القيمة، مثل أسود" required>
-            </div>
-            <div class="col-md-2 d-grid">
-              <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>
-            </div>
-          </div>
-        `);
+          `);
 
         attributesList.querySelector('.product-attribute-row:last-child input')?.focus();
       });

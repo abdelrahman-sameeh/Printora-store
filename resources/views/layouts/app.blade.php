@@ -253,10 +253,19 @@
 <body>
     <nav class="navbar navbar-expand bg-white border-bottom py-3">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                <span class="brand-mark">P</span>
-                <span>Printora</span>
-            </a>
+            @auth
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                    <span class="brand-mark">
+                        {{ mb_substr(auth()->user()->first_name, 0, 1) }}{{ mb_substr(auth()->user()->last_name, 0, 1) }}
+                    </span>
+                    <span>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</span>
+                </a>
+            @else
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                    <span class="brand-mark">G</span>
+                    <span>Guest</span>
+                </a>
+            @endauth
 
             <div class="d-flex align-items-center gap-2">
                 @auth
