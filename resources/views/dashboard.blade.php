@@ -24,6 +24,15 @@
 
                         <hr class="my-5">
 
+                        <div
+                            class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+                            <div>
+                                <h2 class="h5 fw-bold mb-1">عناوين الشحن</h2>
+                                <p class="text-muted-custom mb-0">أضف عناوينك وحدد العنوان الافتراضي للطلبات.</p>
+                            </div>
+                            <a class="btn btn-outline-primary px-4" href="{{ route('addresses.index') }}">عناويني</a>
+                        </div>
+
                         @if ($user->hasRole(\App\Enums\RoleName::SELLER))
                             <div
                                 class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">

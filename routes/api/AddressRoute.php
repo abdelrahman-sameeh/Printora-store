@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\Api\AddressApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('addresses', AddressController::class)->middleware('auth:sanctum');
+Route::apiResource('addresses', AddressApiController::class)
+    ->middleware('auth:sanctum')
+    ->names('api.addresses');
