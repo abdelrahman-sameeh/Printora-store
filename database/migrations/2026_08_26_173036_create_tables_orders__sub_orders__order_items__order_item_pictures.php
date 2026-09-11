@@ -77,6 +77,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('cover_image', 300)->nullable();
             $table->decimal('price_at_purchase', 10, 2);
+            $table->string('size', 30);
+            $table->string('color', 50);
             $table->unsignedInteger('quantity');
             // Copied from products.created_at, which is itself nullable.
             $table->timestamp('created_at_snapshot')->nullable();

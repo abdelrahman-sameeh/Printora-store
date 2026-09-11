@@ -14,9 +14,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $description
  * @property string|null $cover_image
  * @property string $price_at_purchase
+ * @property string $size
+ * @property string $color
  * @property int $quantity
  * @property \Illuminate\Support\Carbon|null $created_at_snapshot
- *
  * @property-read SubOrder $subOrder
  * @property-read Product|null $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItemPicture> $pictures
@@ -37,12 +38,14 @@ class OrderItem extends Model
         'description',
         'cover_image',
         'price_at_purchase',
+        'size',
+        'color',
         'quantity',
         'created_at_snapshot',
     ];
 
     protected $casts = [
-        'price_at_purchase'  => 'decimal:2',
+        'price_at_purchase' => 'decimal:2',
         'created_at_snapshot' => 'datetime',
     ];
 

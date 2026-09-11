@@ -3,6 +3,18 @@
 @section('title', $product->title . ' | Printora')
 
 @section('content')
+    @php
+        $availableVariants = $product->variants->where('quantity', '>', 0)->values();
+        $selectedVariant = $availableVariants->firstWhere('id', (int) old('product_variant_id'))
+            ?? $availableVariants->first();
+        $variantOptions = $availableVariants->map(fn ($variant) => [
+            'id' => $variant->id,
+            'size' => $variant->size,
+            'color' => $variant->color,
+            'stock' => $variant->quantity,
+        ])->values();
+    @endphp
+
     <div class="container py-5">
         <div class="mb-4">
             <a class="text-brand text-decoration-none fw-semibold" href="{{ route('home') }}#products">
@@ -61,14 +73,87 @@
                             @endif
                         </div>
 
+                        @if ($availableVariants->isNotEmpty())
+                            <div class="py-3 border-top">
+                                <span class="text-muted-custom d-block mb-2">الاختيارات المتاحة</span>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach ($availableVariants as $variant)
+                                        <span class="badge text-bg-light border text-dark">
+                                            {{ $variant->size }} — {{ $variant->color }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         @auth
-                            @if (auth()->user()->hasRole(\App\Enums\RoleName::USER) && $product->quantity > 0)
-                                <form class="d-flex gap-2 mt-3" method="POST" action="{{ route('cart.items.store') }}">
+                            @if (auth()->user()->hasRole(\App\Enums\RoleName::USER) && $availableVariants->isNotEmpty())
+                                <form class="product-options d-grid gap-3 mt-3" id="product-cart-form" method="POST"
+                                    action="{{ route('cart.items.store') }}">
                                     @csrf
-                                    <input name="product_id" type="hidden" value="{{ $product->id }}">
-                                    <input class="form-control" name="quantity" type="number" min="1"
-                                        max="{{ $product->quantity }}" value="1" required>
-                                    <button class="btn btn-brand flex-shrink-0" type="submit">أضف للسلة</button>
+                                    <div>
+                                        <h2 class="h5 fw-bold mb-1">اختار المناسب ليك</h2>
+                                        <p class="text-muted-custom small mb-0">المقاسات المعروضة بتتغير حسب اللون.</p>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-sm-6">
+                                            <label class="form-label fw-semibold d-flex align-items-center gap-2"
+                                                for="variant-color">
+                                                <span class="option-step">1</span>
+                                                اللون
+                                            </label>
+                                            <select class="form-select @error('product_variant_id') is-invalid @enderror"
+                                                id="variant-color" required>
+                                                @foreach ($availableVariants->pluck('color')->unique() as $color)
+                                                    <option value="{{ $color }}" @selected($selectedVariant?->color === $color)>
+                                                        {{ $color }}
+                                                        ({{ $availableVariants->where('color', $color)->count() }} مقاس)
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label fw-semibold d-flex align-items-center gap-2"
+                                                for="variant-size">
+                                                <span class="option-step">2</span>
+                                                المقاس
+                                            </label>
+                                            <select class="form-select" id="variant-size" required></select>
+                                        </div>
+                                    </div>
+                                    <input id="product_variant_id" name="product_variant_id" type="hidden"
+                                        value="{{ $selectedVariant?->id }}">
+
+                                    @error('product_variant_id')
+                                        <div class="text-danger small">{{ $message }}</div>
+                                    @enderror
+
+                                    <div class="variant-summary" id="variant-summary" role="status" aria-live="polite"></div>
+
+                                    <div>
+                                        <label class="form-label fw-semibold d-flex align-items-center gap-2"
+                                            for="variant-quantity">
+                                            <span class="option-step">3</span>
+                                            الكمية
+                                        </label>
+                                        <div class="variant-quantity-picker">
+                                            <button class="btn btn-light quantity-action" type="button" data-action="decrease"
+                                                aria-label="تقليل الكمية">−</button>
+                                            <input class="form-control text-center @error('quantity') is-invalid @enderror"
+                                                id="variant-quantity" name="quantity" type="number" min="1"
+                                                max="{{ $selectedVariant?->quantity }}" value="{{ old('quantity', 1) }}"
+                                                inputmode="numeric" aria-label="الكمية" required>
+                                            <button class="btn btn-light quantity-action" type="button" data-action="increase"
+                                                aria-label="زيادة الكمية">+</button>
+                                        </div>
+                                        @error('quantity')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <button class="btn btn-brand w-100" id="add-to-cart-button" type="submit">
+                                        أضف الاختيار للسلة
+                                    </button>
                                 </form>
                             @endif
                         @else
@@ -124,3 +209,120 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        .product-options {
+            padding: 1rem;
+            border: 1px solid rgba(91, 76, 240, .16);
+            border-radius: 1rem;
+            background: rgba(238, 236, 255, .42);
+        }
+
+        .option-step {
+            display: inline-grid;
+            width: 1.65rem;
+            height: 1.65rem;
+            color: #fff;
+            font-size: .78rem;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--brand);
+        }
+
+        .variant-summary {
+            padding: .8rem 1rem;
+            color: var(--brand-dark);
+            font-size: .9rem;
+            font-weight: 600;
+            border-radius: .8rem;
+            background: #fff;
+        }
+
+        .variant-summary.low-stock {
+            color: #b54708;
+            background: #fffaeb;
+        }
+
+        .variant-quantity-picker {
+            display: grid;
+            grid-template-columns: 3.15rem minmax(4rem, 1fr) 3.15rem;
+            gap: .5rem;
+        }
+
+        .variant-quantity-picker .quantity-action {
+            padding-inline: 0;
+            font-size: 1.35rem;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const variants = @json($variantOptions);
+            const variantInput = document.getElementById('product_variant_id');
+            const colorSelect = document.getElementById('variant-color');
+            const sizeSelect = document.getElementById('variant-size');
+            const quantityInput = document.getElementById('variant-quantity');
+            const summary = document.getElementById('variant-summary');
+            const form = document.getElementById('product-cart-form');
+            const submitButton = document.getElementById('add-to-cart-button');
+
+            if (!variantInput || !colorSelect || !sizeSelect || !quantityInput || !summary || !form || !submitButton) {
+                return;
+            }
+
+            const clampQuantity = value => Math.min(
+                Math.max(Number(value) || 1, 1),
+                Number(quantityInput.max)
+            );
+
+            const syncVariant = () => {
+                const variant = variants.find(item =>
+                    item.color === colorSelect.value && item.size === sizeSelect.value
+                );
+
+                if (!variant) {
+                    return;
+                }
+
+                variantInput.value = variant.id;
+                quantityInput.max = variant.stock;
+                quantityInput.value = clampQuantity(quantityInput.value);
+                summary.textContent = `اختيارك: ${variant.color}، مقاس ${variant.size} — متاح ${variant.stock} قطعة`;
+                summary.classList.toggle('low-stock', variant.stock <= 3);
+            };
+
+            const renderSizes = preferredSize => {
+                const sizes = variants.filter(variant => variant.color === colorSelect.value);
+                sizeSelect.replaceChildren(...sizes.map(variant => {
+                    const option = document.createElement('option');
+                    option.value = variant.size;
+                    option.textContent = `${variant.size} (${variant.stock} متاح)`;
+                    option.selected = variant.size === preferredSize;
+
+                    return option;
+                }));
+                syncVariant();
+            };
+
+            colorSelect.addEventListener('change', () => renderSizes());
+            sizeSelect.addEventListener('change', syncVariant);
+            quantityInput.addEventListener('change', () => {
+                quantityInput.value = clampQuantity(quantityInput.value);
+            });
+            form.querySelectorAll('.quantity-action').forEach(button => {
+                button.addEventListener('click', () => {
+                    const direction = button.dataset.action === 'increase' ? 1 : -1;
+                    quantityInput.value = clampQuantity(Number(quantityInput.value) + direction);
+                });
+            });
+            form.addEventListener('submit', () => {
+                submitButton.disabled = true;
+                submitButton.textContent = 'جارٍ الإضافة...';
+            });
+            renderSizes(@json($selectedVariant?->size));
+        });
+    </script>
+@endpush

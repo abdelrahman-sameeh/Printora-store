@@ -58,6 +58,32 @@
       <div class="col-lg-5">
         <div class="dashboard-card card border-0 mb-4">
           <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">المقاسات والألوان</h2>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>المقاس</th>
+                    <th>اللون</th>
+                    <th class="text-end">المخزون</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($product->variants as $variant)
+                    <tr>
+                      <td>{{ $variant->size }}</td>
+                      <td>{{ $variant->color }}</td>
+                      <td class="text-end">{{ $variant->quantity }}</td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card card border-0 mb-4">
+          <div class="card-body p-4">
             <div class="d-flex align-items-start justify-content-between gap-3 mb-4">
               <div>
                 <span class="text-muted-custom d-block mb-1">السعر</span>

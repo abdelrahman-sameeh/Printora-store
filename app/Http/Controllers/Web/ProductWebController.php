@@ -51,7 +51,7 @@ class ProductWebController extends Controller
         $product = $this->ownedProduct($request, $product);
 
         return view('products.show', [
-            'product' => $product->load('attributes', 'sub_categories.category', 'pictures'),
+            'product' => $product->load('attributes', 'sub_categories.category', 'pictures', 'variants'),
         ]);
     }
 
@@ -60,7 +60,7 @@ class ProductWebController extends Controller
         $product = $this->ownedProduct($request, $product);
 
         return view('products.edit', [
-            'product' => $product->load('attributes', 'sub_categories', 'pictures'),
+            'product' => $product->load('attributes', 'sub_categories', 'pictures', 'variants'),
             'subCategories' => SubCategory::with('category')->orderBy('title')->get(),
         ]);
     }

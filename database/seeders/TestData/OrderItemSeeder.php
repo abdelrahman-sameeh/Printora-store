@@ -14,8 +14,8 @@ class OrderItemSeeder extends Seeder
     public function run(): void
     {
         $orderProducts = [
-            'buyer1@gmail.com' => ['تيشيرت كلاسيك نبيتي', 'تيشيرت مخطط أساسي'],
-            'buyer2@gmail.com' => ['تيشيرت حريمي قطني كاجوال', 'تيشيرت رياضي نبيتي للأطفال'],
+            'buyer1@gmail.com' => ['تيشيرت أسود كلاسيك', 'جاكيت هودي حضري'],
+            'buyer2@gmail.com' => ['فستان كتان موف', 'شورت أطفال سماوي'],
         ];
 
         foreach ($orderProducts as $buyerEmail => $productTitles) {
@@ -25,6 +25,8 @@ class OrderItemSeeder extends Seeder
             $products = Product::query()->whereIn('title', $productTitles)->get();
 
             foreach ($products as $product) {
+                $variant = $product->variants()->firstOrFail();
+
                 OrderItem::create([
                     'sub_order_id' => $subOrder->id,
                     'product_id' => $product->id,
@@ -33,6 +35,8 @@ class OrderItemSeeder extends Seeder
                     'description' => $product->description,
                     'cover_image' => $product->cover_image,
                     'price_at_purchase' => $product->price,
+                    'size' => $variant->size,
+                    'color' => $variant->color,
                     'quantity' => 1,
                     'created_at_snapshot' => $product->created_at,
                 ]);

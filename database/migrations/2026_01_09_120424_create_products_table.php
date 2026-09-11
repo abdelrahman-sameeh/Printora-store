@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -18,8 +19,9 @@ return new class extends Migration {
             $table->string('cover_image')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->unsignedInteger('quantity');
-            $table->foreignId('seller_id')->constrained("users")->cascadeOnDelete();
+            // Cached total of all variant quantities.
+            $table->unsignedInteger('quantity')->default(0);
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->integer('sold_count')->default(0);
             $table->decimal('rating_avg', 2, 1)->default(0);
@@ -28,6 +30,18 @@ return new class extends Migration {
 
             $table->unique(['seller_id', 'slug']);
         });
+
+        Schema::create('product_variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->string('size', 30);
+            $table->string('color', 50);
+            $table->unsignedInteger('quantity')->default(0);
+            $table->timestamps();
+
+            $table->unique(['product_id', 'size', 'color']);
+            $table->index(['product_id', 'quantity']);
+        });
     }
 
     /**
@@ -35,6 +49,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        Schema::dropIfExists('product_variants');
         Schema::dropIfExists('products');
     }
 };

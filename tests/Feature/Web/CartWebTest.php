@@ -26,10 +26,11 @@ class CartWebTest extends TestCase
     {
         $buyer = $this->createBuyer('buyer@example.com');
         $product = $this->createProduct($this->createSeller(), 'تيشيرت للاختبار', 150);
+        $variant = $product->variants()->firstOrFail();
 
         $this->actingAs($buyer)
             ->post(route('cart.items.store'), [
-                'product_id' => $product->id,
+                'product_variant_id' => $variant->id,
                 'quantity' => 2,
             ])
             ->assertRedirect(route('cart.index'))
@@ -37,6 +38,7 @@ class CartWebTest extends TestCase
 
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $product->id,
+            'product_variant_id' => $variant->id,
             'quantity' => 2,
         ]);
 
@@ -44,7 +46,46 @@ class CartWebTest extends TestCase
             ->get(route('cart.index'))
             ->assertOk()
             ->assertSee('تيشيرت للاختبار')
+            ->assertSee('M')
+            ->assertSee('أسود')
             ->assertSee('300.00');
+    }
+
+    public function test_each_size_and_color_has_independent_stock_in_the_cart(): void
+    {
+        $buyer = $this->createBuyer('variants-buyer@example.com');
+        $product = $this->createProduct($this->createSeller(), 'تيشيرت متعدد الاختيارات');
+        $mediumBlack = $product->variants()->firstOrFail();
+        $largeBlue = $product->variants()->create([
+            'size' => 'L',
+            'color' => 'أزرق',
+            'quantity' => 1,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('cart.items.store'), [
+                'product_variant_id' => $largeBlue->id,
+                'quantity' => 2,
+            ])
+            ->assertSessionHasErrors('quantity');
+
+        $this->assertDatabaseMissing('cart_items', ['product_variant_id' => $largeBlue->id]);
+
+        $this->actingAs($buyer)
+            ->post(route('cart.items.store'), [
+                'product_variant_id' => $mediumBlack->id,
+                'quantity' => 2,
+            ])
+            ->assertRedirect(route('cart.index'));
+
+        $this->actingAs($buyer)
+            ->post(route('cart.items.store'), [
+                'product_variant_id' => $largeBlue->id,
+                'quantity' => 1,
+            ])
+            ->assertRedirect(route('cart.index'));
+
+        $this->assertDatabaseCount('cart_items', 2);
     }
 
     public function test_buyer_can_update_and_remove_their_cart_item(): void
@@ -52,7 +93,11 @@ class CartWebTest extends TestCase
         $buyer = $this->createBuyer('buyer@example.com');
         $product = $this->createProduct($this->createSeller(), 'منتج السلة');
         $cart = $buyer->cart()->create();
-        $item = $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);
+        $item = $cart->items()->create([
+            'product_id' => $product->id,
+            'product_variant_id' => $product->variants()->firstOrFail()->id,
+            'quantity' => 1,
+        ]);
 
         $this->actingAs($buyer)
             ->put(route('cart.items.update', $item->id), ['quantity' => 3])
@@ -67,6 +112,75 @@ class CartWebTest extends TestCase
         $this->assertDatabaseMissing('cart_items', ['id' => $item->id]);
     }
 
+    public function test_buyer_can_change_size_and_color_inside_the_cart(): void
+    {
+        $buyer = $this->createBuyer('change-variant@example.com');
+        $product = $this->createProduct($this->createSeller(), 'قميص متعدد المقاسات');
+        $mediumBlack = $product->variants()->firstOrFail();
+        $largeBlue = $product->variants()->create([
+            'size' => 'L',
+            'color' => 'أزرق',
+            'quantity' => 4,
+        ]);
+        $item = $buyer->cart()->create()->items()->create([
+            'product_id' => $product->id,
+            'product_variant_id' => $mediumBlack->id,
+            'quantity' => 1,
+        ]);
+
+        $this->actingAs($buyer)
+            ->put(route('cart.items.update', $item->id), [
+                'product_variant_id' => $largeBlue->id,
+                'quantity' => 2,
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('cart_items', [
+            'id' => $item->id,
+            'product_id' => $product->id,
+            'product_variant_id' => $largeBlue->id,
+            'quantity' => 2,
+        ]);
+
+        $this->actingAs($buyer)
+            ->get(route('cart.index'))
+            ->assertOk()
+            ->assertSee('cart-variant-color', false)
+            ->assertSee('cart-variant-size', false)
+            ->assertSee('cart-change-status', false)
+            ->assertSee('حفظ التغيير')
+            ->assertSee('أزرق')
+            ->assertSee('L');
+    }
+
+    public function test_buyer_cannot_replace_a_cart_item_with_another_products_variant(): void
+    {
+        $buyer = $this->createBuyer('foreign-variant@example.com');
+        $seller = $this->createSeller();
+        $product = $this->createProduct($seller, 'المنتج الأصلي');
+        $otherProduct = $this->createProduct($seller, 'منتج آخر');
+        $originalVariant = $product->variants()->firstOrFail();
+        $foreignVariant = $otherProduct->variants()->firstOrFail();
+        $item = $buyer->cart()->create()->items()->create([
+            'product_id' => $product->id,
+            'product_variant_id' => $originalVariant->id,
+            'quantity' => 1,
+        ]);
+
+        $this->actingAs($buyer)
+            ->put(route('cart.items.update', $item->id), [
+                'product_variant_id' => $foreignVariant->id,
+                'quantity' => 1,
+            ])
+            ->assertSessionHasErrors('product_variant_id');
+
+        $this->assertDatabaseHas('cart_items', [
+            'id' => $item->id,
+            'product_variant_id' => $originalVariant->id,
+        ]);
+    }
+
     public function test_buyer_cannot_manage_another_buyers_cart_item(): void
     {
         $owner = $this->createBuyer('owner@example.com');
@@ -74,6 +188,7 @@ class CartWebTest extends TestCase
         $product = $this->createProduct($this->createSeller(), 'منتج خاص');
         $item = $owner->cart()->create()->items()->create([
             'product_id' => $product->id,
+            'product_variant_id' => $product->variants()->firstOrFail()->id,
             'quantity' => 1,
         ]);
         $otherBuyer->cart()->create();
@@ -91,7 +206,11 @@ class CartWebTest extends TestCase
         $seller = $this->createSeller();
         $product = $this->createProduct($seller, 'منتج بخصم', 100);
         $cart = $buyer->cart()->create();
-        $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);
+        $cart->items()->create([
+            'product_id' => $product->id,
+            'product_variant_id' => $product->variants()->firstOrFail()->id,
+            'quantity' => 1,
+        ]);
         $coupon = $this->createCoupon($seller, 'SAVE10');
 
         $this->actingAs($buyer)
@@ -136,7 +255,7 @@ class CartWebTest extends TestCase
 
     private function createProduct(User $seller, string $title, float $price = 100): Product
     {
-        return Product::create([
+        $product = Product::create([
             'title' => $title,
             'description' => 'وصف مناسب للمنتج المستخدم في اختبار السلة.',
             'price' => $price,
@@ -145,6 +264,13 @@ class CartWebTest extends TestCase
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
+        $product->variants()->create([
+            'size' => 'M',
+            'color' => 'أسود',
+            'quantity' => 10,
+        ]);
+
+        return $product;
     }
 
     private function createCoupon(User $seller, string $code): Coupon

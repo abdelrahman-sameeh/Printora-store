@@ -62,6 +62,14 @@
 
                 <div class="d-grid gap-3">
                   @foreach ($group['items'] as $item)
+                    @php
+                      $selectableVariants = collect($item['product']['variants'])
+                        ->filter(fn ($variant) => $variant['stock'] > 0 || $variant['id'] === $item['variant']['id'])
+                        ->values();
+                      $currentColorVariants = $selectableVariants
+                        ->where('color', $item['variant']['color'])
+                        ->values();
+                    @endphp
                     <article class="row g-3 align-items-center border-bottom pb-3">
                       <div class="col-4 col-md-2">
                         <a href="{{ route('products.show', $item['product']['id']) }}">
@@ -74,7 +82,7 @@
                           @endif
                         </a>
                       </div>
-                      <div class="col-8 col-md-4">
+                      <div class="col-8 col-md-3">
                         <h3 class="h6 fw-bold mb-1">
                           <a class="text-dark text-decoration-none"
                             href="{{ route('products.show', $item['product']['id']) }}">
@@ -83,20 +91,60 @@
                         </h3>
                         <span class="text-brand fw-semibold">{{ number_format($item['product']['price'], 2) }} جنيه</span>
                       </div>
-                      <div class="col-7 col-md-4">
-                        <form class="d-flex gap-2" method="POST" action="{{ route('cart.items.update', $item['id']) }}">
+                      <div class="col-12 col-md-5">
+                        <form class="cart-variant-form row g-2 align-items-end p-3" method="POST"
+                          action="{{ route('cart.items.update', $item['id']) }}"
+                          data-variants="{{ $selectableVariants->toJson() }}">
                           @csrf
                           @method('PUT')
-                          <input class="form-control" name="quantity" type="number" min="1"
-                            max="{{ $item['product']['stock'] }}" value="{{ $item['quantity'] }}" required>
-                          <button class="btn btn-outline-primary" type="submit">تحديث</button>
+                          <input class="selected-variant-id" name="product_variant_id" type="hidden"
+                            value="{{ $item['variant']['id'] }}">
+                          <div class="col-6">
+                            <label class="form-label small mb-1">اللون</label>
+                            <select class="form-select cart-variant-color" required>
+                              @foreach ($selectableVariants->pluck('color')->unique() as $color)
+                                <option value="{{ $color }}" @selected($color === $item['variant']['color'])>
+                                  {{ $color }}
+                                </option>
+                              @endforeach
+                            </select>
+                          </div>
+                          <div class="col-6">
+                            <label class="form-label small mb-1">المقاس</label>
+                            <select class="form-select cart-variant-size" required>
+                              @foreach ($currentColorVariants as $variant)
+                                <option value="{{ $variant['size'] }}" @selected($variant['id'] === $item['variant']['id'])>
+                                  {{ $variant['size'] }} ({{ $variant['stock'] }} متاح)
+                                </option>
+                              @endforeach
+                            </select>
+                          </div>
+                          <div class="col-5">
+                            <label class="form-label small mb-1">الكمية</label>
+                            <div class="cart-quantity-picker">
+                              <button class="btn btn-light cart-quantity-action" type="button" data-action="decrease"
+                                aria-label="تقليل الكمية">−</button>
+                              <input class="form-control text-center cart-variant-quantity" name="quantity" type="number"
+                                min="1" max="{{ max($item['variant']['stock'], 1) }}" value="{{ $item['quantity'] }}"
+                                inputmode="numeric" required>
+                              <button class="btn btn-light cart-quantity-action" type="button" data-action="increase"
+                                aria-label="زيادة الكمية">+</button>
+                            </div>
+                          </div>
+                          <div class="col-7 d-grid">
+                            <button class="btn btn-outline-primary cart-update-button" type="submit">حفظ التغيير</button>
+                          </div>
+                          <div class="col-12 d-flex flex-wrap justify-content-between gap-2 small">
+                            <span class="cart-variant-stock text-muted-custom" role="status"></span>
+                            <span class="cart-change-status text-muted-custom" aria-live="polite">لا توجد تغييرات</span>
+                          </div>
                         </form>
                       </div>
-                      <div class="col-5 col-md-2 text-end">
+                      <div class="col-12 col-md-2 text-end">
                         <form method="POST" action="{{ route('cart.items.destroy', $item['id']) }}">
                           @csrf
                           @method('DELETE')
-                          <button class="btn btn-outline-danger" type="submit">حذف</button>
+                          <button class="btn btn-outline-danger w-100" type="submit">حذف</button>
                         </form>
                       </div>
                     </article>
@@ -143,6 +191,7 @@
                 <span class="fw-bold">المطلوب</span>
                 <strong class="text-brand">{{ number_format($cart['summary_cart']['total'], 2) }} جنيه</strong>
               </div>
+              <a class="btn btn-brand w-100 mt-4" href="{{ route('orders.create') }}">إتمام الطلب</a>
             </div>
           </div>
         </aside>
@@ -150,3 +199,131 @@
     @endif
   </div>
 @endsection
+
+@push('styles')
+  <style>
+    .cart-variant-form {
+      border: 1px solid #e4e7ec;
+      border-radius: 1rem;
+      background: #f9fafb;
+      transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+    }
+
+    .cart-variant-form.is-dirty {
+      border-color: rgba(91, 76, 240, .45);
+      background: rgba(238, 236, 255, .42);
+      box-shadow: 0 0 0 .2rem rgba(91, 76, 240, .07);
+    }
+
+    .cart-quantity-picker {
+      display: grid;
+      grid-template-columns: 2.6rem minmax(3.5rem, 1fr) 2.6rem;
+      gap: .35rem;
+    }
+
+    .cart-quantity-picker .btn,
+    .cart-quantity-picker .form-control {
+      min-height: 3.15rem;
+      padding-inline: .25rem;
+    }
+
+    .cart-quantity-picker .cart-quantity-action {
+      font-size: 1.1rem;
+    }
+  </style>
+@endpush
+
+@push('scripts')
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.cart-variant-form').forEach(form => {
+        const variants = JSON.parse(form.dataset.variants);
+        const variantInput = form.querySelector('.selected-variant-id');
+        const colorSelect = form.querySelector('.cart-variant-color');
+        const sizeSelect = form.querySelector('.cart-variant-size');
+        const quantityInput = form.querySelector('.cart-variant-quantity');
+        const updateButton = form.querySelector('.cart-update-button');
+        const stockStatus = form.querySelector('.cart-variant-stock');
+        const changeStatus = form.querySelector('.cart-change-status');
+        const initialVariantId = Number(variantInput.value);
+        const initialQuantity = Number(quantityInput.value);
+
+        const clampQuantity = value => Math.min(
+          Math.max(Number(value) || 1, 1),
+          Number(quantityInput.max)
+        );
+
+        const syncFormState = variant => {
+          const quantity = Number(quantityInput.value);
+          const hasChanges = Number(variantInput.value) !== initialVariantId ||
+            quantity !== initialQuantity;
+          const isAvailable = variant.stock > 0;
+          const hasValidQuantity = quantity >= 1 && quantity <= variant.stock;
+
+          form.classList.toggle('is-dirty', hasChanges);
+          stockStatus.textContent = isAvailable ? `متاح ${variant.stock} قطعة` : 'الاختيار الحالي نفد من المخزون';
+          stockStatus.classList.toggle('text-danger', !isAvailable);
+          changeStatus.textContent = hasChanges ? 'عندك تغييرات غير محفوظة' : 'لا توجد تغييرات';
+          changeStatus.classList.toggle('text-brand', hasChanges);
+          updateButton.disabled = !hasChanges || !isAvailable || !hasValidQuantity;
+        };
+
+        const syncVariant = () => {
+          const variant = variants.find(item =>
+            item.color === colorSelect.value && item.size === sizeSelect.value
+          );
+
+          if (!variant) {
+            return;
+          }
+
+          variantInput.value = variant.id;
+          quantityInput.max = Math.max(variant.stock, 1);
+          quantityInput.value = clampQuantity(quantityInput.value);
+          syncFormState(variant);
+        };
+
+        const renderSizes = preferredVariantId => {
+          const sizes = variants.filter(variant => variant.color === colorSelect.value);
+          const selectedVariant = sizes.find(variant => variant.id === preferredVariantId) ?? sizes[0];
+
+          sizeSelect.replaceChildren(...sizes.map(variant => {
+            const option = document.createElement('option');
+            option.value = variant.size;
+            option.textContent = `${variant.size} (${variant.stock} متاح)`;
+            option.selected = variant.id === selectedVariant?.id;
+
+            return option;
+          }));
+          syncVariant();
+        };
+
+        colorSelect.addEventListener('change', () => renderSizes());
+        sizeSelect.addEventListener('change', syncVariant);
+        quantityInput.addEventListener('input', () => {
+          const variant = variants.find(item => Number(item.id) === Number(variantInput.value));
+
+          if (variant) {
+            syncFormState(variant);
+          }
+        });
+        quantityInput.addEventListener('change', () => {
+          quantityInput.value = clampQuantity(quantityInput.value);
+          syncVariant();
+        });
+        form.querySelectorAll('.cart-quantity-action').forEach(button => {
+          button.addEventListener('click', () => {
+            const direction = button.dataset.action === 'increase' ? 1 : -1;
+            quantityInput.value = clampQuantity(Number(quantityInput.value) + direction);
+            syncVariant();
+          });
+        });
+        form.addEventListener('submit', () => {
+          updateButton.disabled = true;
+          updateButton.textContent = 'جارٍ الحفظ...';
+        });
+        renderSizes(Number(variantInput.value));
+      });
+    });
+  </script>
+@endpush

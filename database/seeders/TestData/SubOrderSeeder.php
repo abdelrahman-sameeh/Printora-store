@@ -15,11 +15,11 @@ class SubOrderSeeder extends Seeder
         $seller = User::query()->where('email', 'printora.shop0@gmail.com')->firstOrFail();
         $subOrders = [
             'buyer1@gmail.com' => [
-                'products' => ['تيشيرت كلاسيك نبيتي', 'تيشيرت مخطط أساسي'],
+                'products' => ['تيشيرت أسود كلاسيك', 'جاكيت هودي حضري'],
                 'status' => 'processing',
             ],
             'buyer2@gmail.com' => [
-                'products' => ['تيشيرت حريمي قطني كاجوال', 'تيشيرت رياضي نبيتي للأطفال'],
+                'products' => ['فستان كتان موف', 'شورت أطفال سماوي'],
                 'status' => 'completed',
             ],
         ];

@@ -14,12 +14,12 @@ class CartItemSeeder extends Seeder
     {
         $cartItems = [
             'buyer1@gmail.com' => [
-                'تيشيرت كلاسيك نبيتي' => 1,
-                'تيشيرت مخطط أساسي' => 2,
+                'تيشيرت أسود كلاسيك' => 1,
+                'جاكيت هودي حضري' => 2,
             ],
             'buyer2@gmail.com' => [
-                'تيشيرت حريمي قطني كاجوال' => 1,
-                'تيشيرت رياضي نبيتي للأطفال' => 1,
+                'فستان كتان موف' => 1,
+                'شورت أطفال سماوي' => 1,
             ],
         ];
 
@@ -29,10 +29,12 @@ class CartItemSeeder extends Seeder
 
             foreach ($products as $productTitle => $quantity) {
                 $product = Product::query()->where('title', $productTitle)->firstOrFail();
+                $variant = $product->variants()->where('quantity', '>=', $quantity)->firstOrFail();
 
                 CartItem::create([
                     'cart_id' => $cart->id,
                     'product_id' => $product->id,
+                    'product_variant_id' => $variant->id,
                     'quantity' => $quantity,
                 ]);
             }

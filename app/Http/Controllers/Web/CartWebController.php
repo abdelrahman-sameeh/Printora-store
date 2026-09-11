@@ -23,12 +23,12 @@ class CartWebController extends Controller
     public function storeItem(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'product_variant_id' => ['required', 'integer', 'exists:product_variants,id'],
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
         $this->cartService->addItems($request->user(), [[
-            'id' => $validated['product_id'],
+            'variant_id' => $validated['product_variant_id'],
             'quantity' => $validated['quantity'],
         ]]);
 
@@ -37,10 +37,18 @@ class CartWebController extends Controller
 
     public function updateItem(Request $request, int $item): RedirectResponse
     {
-        $validated = $request->validate(['quantity' => ['required', 'integer', 'min:1']]);
-        $this->cartService->updateItem($request->user(), $item, $validated['quantity']);
+        $validated = $request->validate([
+            'product_variant_id' => ['sometimes', 'required', 'integer', 'exists:product_variants,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+        $this->cartService->updateItem(
+            $request->user(),
+            $item,
+            $validated['quantity'],
+            $validated['product_variant_id'] ?? null,
+        );
 
-        return back()->with('success', 'تم تحديث الكمية.');
+        return back()->with('success', 'تم تحديث المنتج في السلة.');
     }
 
     public function removeItem(Request $request, int $item): RedirectResponse

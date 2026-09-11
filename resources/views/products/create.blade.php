@@ -3,6 +3,10 @@
 @section('title', 'إضافة منتج | Printora')
 
 @section('content')
+  @php
+    $variantRows = old('variants', [['size' => 'M', 'color' => '', 'quantity' => 0]]);
+  @endphp
+
   <div class="container py-5">
     <div class="mb-4">
       <a class="text-brand text-decoration-none fw-semibold" href="{{ route('seller.products.index') }}">العودة
@@ -54,13 +58,7 @@
                 name="description" rows="5" required>{{ old('description') }}</textarea>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" for="quantity">الكمية المتاحة</label>
-              <input class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity"
-                type="number" min="0" value="{{ old('quantity') }}" required>
-            </div>
-
-            <div class="col-md-6">
+            <div class="col-12">
               <label class="form-label fw-semibold" for="cover_image">الصورة الرئيسية</label>
               <input class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image"
                 type="file" accept="image/jpeg,image/png,image/webp" required>
@@ -84,6 +82,8 @@
               </select>
             </div>
 
+            @include('products._variants', ['variantRows' => $variantRows])
+
             <div class="col-12">
               <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
                 <label class="form-label fw-semibold mb-0">خصائص المنتج</label>
@@ -98,7 +98,7 @@
                     <div class="col-md-5">
                       <input class="form-control @error("attributes.$index.key") is-invalid @enderror"
                         name="attributes[{{ $index }}][key]" type="text" value="{{ $attribute['key'] ?? '' }}"
-                        placeholder="الخاصية، مثل اللون" required>
+                        placeholder="الخاصية، مثل الخامة" required>
                       @error("attributes.$index.key")
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -106,7 +106,7 @@
                     <div class="col-md-5">
                       <input class="form-control @error("attributes.$index.value") is-invalid @enderror"
                         name="attributes[{{ $index }}][value]" type="text" value="{{ $attribute['value'] ?? '' }}"
-                        placeholder="القيمة، مثل أسود" required>
+                        placeholder="القيمة، مثل قطن" required>
                       @error("attributes.$index.value")
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -117,7 +117,7 @@
                   </div>
                 @empty
                   <p class="text-muted-custom mb-0" id="attributes-empty-state">
-                    لا توجد خصائص بعد. اضغط «إضافة خاصية» لإضافة اللون أو المقاس أو غيرهما.
+                    لا توجد خصائص بعد. اضغط «إضافة خاصية» لإضافة الخامة أو نوع القَصّة أو غيرهما.
                   </p>
                 @endforelse
               </div>
@@ -135,6 +135,7 @@
 @endsection
 
 @push('scripts')
+  @include('products._variant_script')
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const attributesList = document.getElementById('attributes-list');
@@ -152,7 +153,7 @@
         if (!emptyState) {
           attributesList.insertAdjacentHTML(
             'beforeend',
-            '<p class="text-muted-custom mb-0" id="attributes-empty-state">لا توجد خصائص بعد. اضغط «إضافة خاصية» لإضافة اللون أو المقاس أو غيرهما.</p>'
+            '<p class="text-muted-custom mb-0" id="attributes-empty-state">لا توجد خصائص بعد. اضغط «إضافة خاصية» لإضافة الخامة أو نوع القَصّة أو غيرهما.</p>'
           );
         }
       };
@@ -166,11 +167,11 @@
             <div class="row g-2 align-items-start product-attribute-row">
               <div class="col-md-5">
                 <input class="form-control" name="attributes[${index}][key]" type="text"
-                  placeholder="الخاصية، مثل اللون" required>
+                  placeholder="الخاصية، مثل الخامة" required>
               </div>
               <div class="col-md-5">
                 <input class="form-control" name="attributes[${index}][value]" type="text"
-                  placeholder="القيمة، مثل أسود" required>
+                  placeholder="القيمة، مثل قطن" required>
               </div>
               <div class="col-md-2 d-grid">
                 <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>

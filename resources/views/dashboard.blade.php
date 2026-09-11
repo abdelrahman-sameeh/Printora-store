@@ -30,7 +30,12 @@
                                 <h2 class="h5 fw-bold mb-1">عناوين الشحن</h2>
                                 <p class="text-muted-custom mb-0">أضف عناوينك وحدد العنوان الافتراضي للطلبات.</p>
                             </div>
-                            <a class="btn btn-outline-primary px-4" href="{{ route('addresses.index') }}">عناويني</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                @if ($user->hasRole(\App\Enums\RoleName::USER))
+                                    <a class="btn btn-brand px-4" href="{{ route('orders.index') }}">طلباتي</a>
+                                @endif
+                                <a class="btn btn-outline-primary px-4" href="{{ route('addresses.index') }}">عناويني</a>
+                            </div>
                         </div>
 
                         @if ($user->hasRole(\App\Enums\RoleName::SELLER))
@@ -44,6 +49,8 @@
                                     <a class="btn btn-brand px-4" href="{{ route('seller.products.index') }}">منتجاتي</a>
                                     <a class="btn btn-outline-primary px-4"
                                         href="{{ route('seller.coupons.index') }}">كوبوناتي</a>
+                                    <a class="btn btn-outline-primary px-4"
+                                        href="{{ route('seller.orders.index') }}">طلبات المنتجات</a>
                                 </div>
                             </div>
                         @endif

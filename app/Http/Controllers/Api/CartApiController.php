@@ -28,7 +28,7 @@ class CartApiController extends Controller
     {
         $validated = $request->validate([
             'items' => ['required', 'array', 'min:1'],
-            'items.*.id' => ['required', 'integer', 'exists:products,id'],
+            'items.*.variant_id' => ['required', 'integer', 'exists:product_variants,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
         ]);
         $cart = $this->cartService->addItems($request->user(), $validated['items']);
@@ -41,11 +41,19 @@ class CartApiController extends Controller
 
     public function updateItem(Request $request, int $item): JsonResponse
     {
-        $validated = $request->validate(['quantity' => ['required', 'integer', 'min:1']]);
-        $cartItem = $this->cartService->updateItem($request->user(), $item, $validated['quantity']);
+        $validated = $request->validate([
+            'variant_id' => ['sometimes', 'required', 'integer', 'exists:product_variants,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+        $cartItem = $this->cartService->updateItem(
+            $request->user(),
+            $item,
+            $validated['quantity'],
+            $validated['variant_id'] ?? null,
+        );
 
         return response()->json([
-            'message' => 'Item quantity updated successfully.',
+            'message' => 'Cart item updated successfully.',
             'data' => $cartItem,
         ]);
     }

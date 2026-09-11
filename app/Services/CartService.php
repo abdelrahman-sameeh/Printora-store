@@ -6,7 +6,7 @@ use App\Models\Cart\Cart;
 use App\Models\Cart\CartCoupon;
 use App\Models\Cart\CartItem;
 use App\Models\Coupon;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 
@@ -22,17 +22,19 @@ class CartService
         $cart = $user->cart()->firstOrCreate();
 
         foreach ($items as $itemData) {
-            $product = Product::query()->findOrFail($itemData['id']);
-            $item = $cart->items()->where('product_id', $product->id)->first();
+            $variant = ProductVariant::query()->with('product')->findOrFail($itemData['variant_id']);
+            $product = $variant->product;
+            $item = $cart->items()->where('product_variant_id', $variant->id)->first();
             $quantity = ($item?->quantity ?? 0) + $itemData['quantity'];
 
-            $this->ensureAvailable($product, $quantity);
+            $this->ensureAvailable($variant, $quantity);
 
             if ($item) {
                 $item->update(['quantity' => $quantity]);
             } else {
                 $cart->items()->create([
                     'product_id' => $product->id,
+                    'product_variant_id' => $variant->id,
                     'quantity' => $quantity,
                 ]);
             }
@@ -41,13 +43,38 @@ class CartService
         return $cart;
     }
 
-    public function updateItem(User $user, int $itemId, int $quantity): CartItem
+    public function updateItem(User $user, int $itemId, int $quantity, ?int $variantId = null): CartItem
     {
-        $item = $this->requireCart($user)->items()->with('product')->findOrFail($itemId);
-        $this->ensureAvailable($item->product, $quantity);
-        $item->update(['quantity' => $quantity]);
+        $cart = $this->requireCart($user);
+        $item = $cart->items()->with('variant.product')->findOrFail($itemId);
+        $variant = $variantId
+            ? ProductVariant::query()->with('product')->findOrFail($variantId)
+            : $item->variant;
 
-        return $item->refresh();
+        if ($variant->product_id !== $item->product_id) {
+            throw ValidationException::withMessages([
+                'product_variant_id' => 'المقاس واللون المختاران لا يخصان هذا المنتج.',
+            ]);
+        }
+
+        $variantAlreadyExists = $cart->items()
+            ->where('product_variant_id', $variant->id)
+            ->where('id', '!=', $item->id)
+            ->exists();
+
+        if ($variantAlreadyExists) {
+            throw ValidationException::withMessages([
+                'product_variant_id' => 'هذا المقاس واللون موجودان بالفعل في السلة.',
+            ]);
+        }
+
+        $this->ensureAvailable($variant, $quantity);
+        $item->update([
+            'product_variant_id' => $variant->id,
+            'quantity' => $quantity,
+        ]);
+
+        return $item->refresh()->load('variant.product');
     }
 
     public function removeItem(User $user, int $itemId): void
@@ -120,11 +147,11 @@ class CartService
             ];
         }
 
-        $cart->load(['items.product', 'coupons.coupon']);
+        $cart->load(['items.variant.product', 'coupons.coupon']);
         $errors = [];
 
         foreach ($cart->items as $item) {
-            if (! $item->product->is_active) {
+            if (! $item->variant->product->is_active) {
                 $errors[] = [
                     'item_id' => $item->id,
                     'product_id' => $item->product_id,
@@ -133,14 +160,14 @@ class CartService
                 ];
             }
 
-            if ($item->product->quantity < $item->quantity) {
+            if ($item->variant->quantity < $item->quantity) {
                 $errors[] = [
                     'item_id' => $item->id,
                     'product_id' => $item->product_id,
                     'type' => 'insufficient_stock',
-                    'message' => "المتاح من المنتج {$item->product->quantity} فقط.",
+                    'message' => "المتاح من المقاس واللون المختارين {$item->variant->quantity} فقط.",
                     'requested_quantity' => $item->quantity,
-                    'available_quantity' => $item->product->quantity,
+                    'available_quantity' => $item->variant->quantity,
                 ];
             }
         }
@@ -169,11 +196,12 @@ class CartService
             return $this->emptyData();
         }
 
-        $cart->load(['items.product', 'coupons.coupon']);
+        $cart->load(['items.variant.product.variants', 'coupons.coupon']);
         $groups = [];
 
         foreach ($cart->items as $item) {
-            $sellerId = $item->product->seller_id;
+            $product = $item->variant->product;
+            $sellerId = $product->seller_id;
             $groups[$sellerId] ??= [
                 'seller_id' => $sellerId,
                 'items' => [],
@@ -182,15 +210,26 @@ class CartService
             $groups[$sellerId]['items'][] = [
                 'id' => $item->id,
                 'quantity' => $item->quantity,
+                'variant' => [
+                    'id' => $item->variant->id,
+                    'size' => $item->variant->size,
+                    'color' => $item->variant->color,
+                    'stock' => $item->variant->quantity,
+                ],
                 'product' => [
-                    'id' => $item->product->id,
-                    'title' => $item->product->title,
-                    'slug' => $item->product->slug,
-                    'price' => (float) $item->product->price,
-                    'cover_image' => $item->product->cover_image
-                        ? $item->product->cover_image_url
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'slug' => $product->slug,
+                    'price' => (float) $product->price,
+                    'cover_image' => $product->cover_image
+                        ? $product->cover_image_url
                         : null,
-                    'stock' => $item->product->quantity,
+                    'variants' => $product->variants->map(fn (ProductVariant $variant): array => [
+                        'id' => $variant->id,
+                        'size' => $variant->size,
+                        'color' => $variant->color,
+                        'stock' => $variant->quantity,
+                    ])->values()->all(),
                 ],
             ];
         }
@@ -249,15 +288,17 @@ class CartService
         return $user->cart()->firstOrFail();
     }
 
-    private function ensureAvailable(Product $product, int $quantity): void
+    private function ensureAvailable(ProductVariant $variant, int $quantity): void
     {
+        $product = $variant->product;
+
         if (! $product->is_active) {
             throw ValidationException::withMessages(['quantity' => 'هذا المنتج غير متاح حاليًا.']);
         }
 
-        if ($quantity > $product->quantity) {
+        if ($quantity > $variant->quantity) {
             throw ValidationException::withMessages([
-                'quantity' => "الكمية المتاحة من {$product->title} هي {$product->quantity} فقط.",
+                'quantity' => "الكمية المتاحة من {$product->title} بالمقاس {$variant->size} واللون {$variant->color} هي {$variant->quantity} فقط.",
             ]);
         }
     }

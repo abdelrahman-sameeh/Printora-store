@@ -191,6 +191,11 @@ class StorefrontWebTest extends TestCase
             'quantity' => 7,
         ]);
         $activeProduct->attributes()->create(['key' => 'size', 'value' => 'Medium']);
+        $activeProduct->variants()->create([
+            'size' => 'M',
+            'color' => 'أسود',
+            'quantity' => 7,
+        ]);
         $inactiveProduct = $seller->products()->create([
             'title' => 'Hidden Product',
             'description' => 'This product is not publicly available.',
@@ -205,10 +210,47 @@ class StorefrontWebTest extends TestCase
             ->assertOk()
             ->assertSee('Public Product')
             ->assertSee('225.00')
-            ->assertSee('Medium');
+            ->assertSee('Medium')
+            ->assertSee('M')
+            ->assertSee('أسود');
 
         $this->get(route('products.show', $inactiveProduct))
             ->assertNotFound();
+    }
+
+    public function test_buyer_selects_color_and_size_separately_before_adding_to_cart(): void
+    {
+        $seller = $this->createSeller();
+        $buyer = User::create([
+            'first_name' => 'مشتري',
+            'last_name' => 'تجريبي',
+            'email' => 'variant-buyer@example.com',
+            'password' => 'password123',
+        ]);
+        $buyer->syncRoles(RoleName::USER);
+        $product = $seller->products()->create([
+            'title' => 'قميص ملون',
+            'description' => 'قميص متاح بألوان ومقاسات مختلفة.',
+            'price' => 250,
+            'discount_amount' => 0,
+            'quantity' => 5,
+        ]);
+        $product->variants()->createMany([
+            ['size' => 'M', 'color' => 'أسود', 'quantity' => 3],
+            ['size' => 'L', 'color' => 'أزرق', 'quantity' => 2],
+        ]);
+
+        $this->actingAs($buyer)
+            ->get(route('products.show', $product))
+            ->assertOk()
+            ->assertSee('id="variant-color"', false)
+            ->assertSee('id="variant-size"', false)
+            ->assertSee('name="product_variant_id"', false)
+            ->assertSee('اختار المناسب ليك')
+            ->assertSee('id="variant-summary"', false)
+            ->assertSee('data-action="increase"', false)
+            ->assertSee('أسود')
+            ->assertSee('أزرق');
     }
 
     private function createSeller(): User

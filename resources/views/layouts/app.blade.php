@@ -253,33 +253,30 @@
 <body>
     <nav class="navbar navbar-expand bg-white border-bottom py-3">
         <div class="container">
-            @auth
-                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                    <span class="brand-mark">
-                        {{ mb_substr(auth()->user()->first_name, 0, 1) }}{{ mb_substr(auth()->user()->last_name, 0, 1) }}
-                    </span>
-                    <span>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</span>
-                </a>
-            @else
-                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                    <span class="brand-mark">G</span>
-                    <span>Guest</span>
-                </a>
-            @endauth
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <span class="brand-mark">PS</span>
+                <span class="text-capitalize">printora store</span>
+            </a>
 
             <div class="d-flex align-items-center gap-2">
                 @auth
                     @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
-                        <a class="btn btn-outline-primary px-3" href="{{ route('cart.index') }}">السلة</a>
+                        <a @class(['btn px-3', 'btn-brand' => request()->routeIs('orders.*'), 'btn-light' => !request()->routeIs('orders.*')]) href="{{ route('orders.index') }}"
+                            @if (request()->routeIs('orders.*')) aria-current="page" @endif>طلباتي</a>
+                        <a @class(['btn px-3', 'btn-brand' => request()->routeIs('cart.*'), 'btn-light' => !request()->routeIs('cart.*')]) href="{{ route('cart.index') }}"
+                            @if (request()->routeIs('cart.*')) aria-current="page" @endif>السلة</a>
                     @endif
-                    <a class="btn btn-light px-3" href="{{ route('dashboard') }}">حسابي</a>
+                    <a @class(['btn px-3', 'btn-brand' => request()->routeIs('dashboard'), 'btn-light' => !request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"
+                        @if (request()->routeIs('dashboard')) aria-current="page" @endif>حسابي</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="btn btn-outline-danger px-3" type="submit">تسجيل الخروج</button>
                     </form>
                 @else
-                    <a class="btn btn-light px-3" href="{{ route('login') }}">دخول</a>
-                    <a class="btn btn-brand px-3" href="{{ route('register') }}">حساب جديد</a>
+                    <a @class(['btn px-3', 'btn-brand' => request()->routeIs('login*'), 'btn-light' => !request()->routeIs('login*')]) href="{{ route('login') }}"
+                        @if (request()->routeIs('login*')) aria-current="page" @endif>دخول</a>
+                    <a @class(['btn px-3', 'btn-brand' => request()->routeIs('register*'), 'btn-outline-primary' => !request()->routeIs('register*')]) href="{{ route('register') }}"
+                        @if (request()->routeIs('register*')) aria-current="page" @endif>حساب جديد</a>
                 @endauth
             </div>
         </div>

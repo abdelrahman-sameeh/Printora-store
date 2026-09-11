@@ -17,10 +17,11 @@ class CartApiTest extends TestCase
     {
         $buyer = $this->createBuyer();
         $product = $this->createProduct($this->createSeller());
+        $variant = $product->variants()->firstOrFail();
         Sanctum::actingAs($buyer);
 
         $this->postJson('/api/cart/items', [
-            'items' => [['id' => $product->id, 'quantity' => 2]],
+            'items' => [['variant_id' => $variant->id, 'quantity' => 2]],
         ])
             ->assertCreated()
             ->assertJsonPath('cart.items_count', 1)
@@ -28,7 +29,25 @@ class CartApiTest extends TestCase
 
         $this->getJson('/api/cart')
             ->assertOk()
-            ->assertJsonPath('cart.groups.0.items.0.product.title', 'منتج API');
+            ->assertJsonPath('cart.groups.0.items.0.product.title', 'منتج API')
+            ->assertJsonPath('cart.groups.0.items.0.variant.size', 'M')
+            ->assertJsonPath('cart.groups.0.items.0.variant.color', 'أسود')
+            ->assertJsonCount(1, 'cart.groups.0.items.0.product.variants');
+
+        $largeBlue = $product->variants()->create([
+            'size' => 'L',
+            'color' => 'أزرق',
+            'quantity' => 3,
+        ]);
+        $cartItem = $buyer->cart()->firstOrFail()->items()->firstOrFail();
+
+        $this->putJson("/api/cart/items/{$cartItem->id}", [
+            'variant_id' => $largeBlue->id,
+            'quantity' => 1,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.product_variant_id', $largeBlue->id)
+            ->assertJsonPath('data.quantity', 1);
 
         $this->postJson('/api/cart/validate')
             ->assertOk()
@@ -60,7 +79,7 @@ class CartApiTest extends TestCase
 
     private function createProduct(User $seller): Product
     {
-        return Product::create([
+        $product = Product::create([
             'title' => 'منتج API',
             'description' => 'وصف مناسب للمنتج المستخدم في اختبار السلة.',
             'price' => 75,
@@ -69,5 +88,12 @@ class CartApiTest extends TestCase
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
+        $product->variants()->create([
+            'size' => 'M',
+            'color' => 'أسود',
+            'quantity' => 10,
+        ]);
+
+        return $product;
     }
 }

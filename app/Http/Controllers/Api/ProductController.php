@@ -26,7 +26,7 @@ class ProductController
             return response()->json([
                 'message' => $exception->getMessage(),
                 'data' => new ProductResource(
-                    $exception->product->load('sub_categories', 'pictures', 'attributes')
+                    $exception->product->load('sub_categories', 'pictures', 'attributes', 'variants')
                 ),
             ], 409);
         }
@@ -34,7 +34,7 @@ class ProductController
         return response()->json([
             'message' => 'product created successfully',
             'data' => new ProductResource(
-                $product->load('sub_categories', 'pictures', 'attributes')
+                $product->load('sub_categories', 'pictures', 'attributes', 'variants')
             ),
         ], 201);
 
@@ -72,7 +72,7 @@ class ProductController
         }
 
         return response()->json(
-            new ProductResource($product->load('attributes', 'sub_categories', 'pictures')),
+            new ProductResource($product->load('attributes', 'sub_categories', 'pictures', 'variants')),
         );
     }
 
@@ -132,22 +132,20 @@ class ProductController
                 'message' => 'product not found',
             ], 404);
         }
-        $data = $request->validated();
-
-        if ($request->file('cover_image')) {
-            // delete last cover image
-            $path = str_replace('/storage/', '', $product->cover_image);
-
-            if (Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->delete($path);
-            }
-
-            $newCoverPath = $request->file('cover_image')->store('products/covers', 'public');
-            $data['cover_image'] = Storage::url($newCoverPath);
+        try {
+            $product = $this->productService->update($user, $product, $request->validated());
+        } catch (ProductAlreadyExistsException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'data' => new ProductResource(
+                    $exception->product->load('sub_categories', 'pictures', 'attributes', 'variants')
+                ),
+            ], 409);
         }
-        $product->update($data);
 
-        return $product;
+        return response()->json(new ProductResource(
+            $product->load('sub_categories', 'pictures', 'attributes', 'variants')
+        ));
     }
 
     public function add_product_pictures(Request $request, $id)

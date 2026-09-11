@@ -10,6 +10,11 @@
       'value' => $attribute->value,
     ])->all());
     $nextAttributeIndex = empty($attributeRows) ? 0 : max(array_keys($attributeRows)) + 1;
+    $variantRows = old('variants', $product->variants->map(fn($variant) => [
+      'size' => $variant->size,
+      'color' => $variant->color,
+      'quantity' => $variant->quantity,
+    ])->all());
   @endphp
 
   <div class="container py-5">
@@ -66,13 +71,7 @@
                 name="description" rows="5" required>{{ old('description', $product->description) }}</textarea>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" for="quantity">الكمية المتاحة</label>
-              <input class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity"
-                type="number" min="0" value="{{ old('quantity', $product->quantity) }}" required>
-            </div>
-
-            <div class="col-md-6">
+            <div class="col-12">
               <label class="form-label fw-semibold" for="cover_image">تغيير الصورة الرئيسية</label>
               <input class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image"
                 type="file" accept="image/jpeg,image/png,image/webp">
@@ -104,6 +103,8 @@
               </select>
             </div>
 
+            @include('products._variants', ['variantRows' => $variantRows])
+
             <div class="col-12">
               <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
                 <label class="form-label fw-semibold mb-0">خصائص المنتج</label>
@@ -116,7 +117,7 @@
                     <div class="col-md-5">
                       <input class="form-control @error("attributes.$index.key") is-invalid @enderror"
                         name="attributes[{{ $index }}][key]" type="text" value="{{ $attribute['key'] ?? '' }}"
-                        placeholder="الخاصية، مثل اللون" required>
+                        placeholder="الخاصية، مثل الخامة" required>
                       @error("attributes.$index.key")
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -124,7 +125,7 @@
                     <div class="col-md-5">
                       <input class="form-control @error("attributes.$index.value") is-invalid @enderror"
                         name="attributes[{{ $index }}][value]" type="text" value="{{ $attribute['value'] ?? '' }}"
-                        placeholder="القيمة، مثل أسود" required>
+                        placeholder="القيمة، مثل قطن" required>
                       @error("attributes.$index.value")
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -151,6 +152,7 @@
 @endsection
 
 @push('scripts')
+  @include('products._variant_script')
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const attributesList = document.getElementById('attributes-list');
@@ -178,11 +180,11 @@
             <div class="row g-2 align-items-start product-attribute-row">
               <div class="col-md-5">
                 <input class="form-control" name="attributes[${index}][key]" type="text"
-                  placeholder="الخاصية، مثل اللون" required>
+                  placeholder="الخاصية، مثل الخامة" required>
               </div>
               <div class="col-md-5">
                 <input class="form-control" name="attributes[${index}][value]" type="text"
-                  placeholder="القيمة، مثل أسود" required>
+                  placeholder="القيمة، مثل قطن" required>
               </div>
               <div class="col-md-2 d-grid">
                 <button class="btn btn-outline-danger remove-attribute" type="button">حذف</button>

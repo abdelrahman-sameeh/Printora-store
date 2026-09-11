@@ -52,7 +52,10 @@ class ProductWebTest extends TestCase
                 'description' => 'A phone prepared for the product feature test.',
                 'price' => '199.99',
                 'discount_amount' => 20,
-                'quantity' => 10,
+                'variants' => [
+                    ['size' => 'M', 'color' => 'أسود', 'quantity' => 6],
+                    ['size' => 'L', 'color' => 'أسود', 'quantity' => 4],
+                ],
                 'cover_image' => UploadedFile::fake()->createWithContent(
                     'cover.png',
                     base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=')
@@ -74,6 +77,13 @@ class ProductWebTest extends TestCase
 
         $product = $seller->products()->firstOrFail();
         $this->assertSame(179.99, $product->price_after_discount);
+        $this->assertSame(10, $product->quantity);
+        $this->assertDatabaseHas('product_variants', [
+            'product_id' => $product->id,
+            'size' => 'M',
+            'color' => 'أسود',
+            'quantity' => 6,
+        ]);
         $this->assertDatabaseHas('product_sub_category', [
             'product_id' => $product->id,
             'sub_category_id' => $subCategory->id,
@@ -115,6 +125,7 @@ class ProductWebTest extends TestCase
         ]);
         $product->sub_categories()->attach($subCategory);
         $product->attributes()->create(['key' => 'ram', 'value' => '32 GB']);
+        $product->variants()->create(['size' => 'L', 'color' => 'أسود', 'quantity' => 6]);
         $product->pictures()->create(['picture' => '/storage/products/gallery/laptop-side.png']);
 
         $this->actingAs($seller)
@@ -130,6 +141,7 @@ class ProductWebTest extends TestCase
             ->assertSee('Electronics / Laptops')
             ->assertSee('ram')
             ->assertSee('32 GB')
+            ->assertSee('أسود')
             ->assertSee('1,400.00');
     }
 
@@ -157,6 +169,7 @@ class ProductWebTest extends TestCase
         ]);
         $product->sub_categories()->attach($subCategory);
         $product->attributes()->create(['key' => 'color', 'value' => 'Red']);
+        $oldVariant = $product->variants()->create(['size' => 'M', 'color' => 'أحمر', 'quantity' => 4]);
 
         $this->actingAs($seller)
             ->get(route('seller.products.edit', $product))
@@ -169,7 +182,10 @@ class ProductWebTest extends TestCase
                 'description' => 'The updated product description.',
                 'price' => 120,
                 'discount_amount' => 10,
-                'quantity' => 8,
+                'variants' => [
+                    ['size' => 'L', 'color' => 'أزرق', 'quantity' => 5],
+                    ['size' => 'XL', 'color' => 'أسود', 'quantity' => 3],
+                ],
                 'sub_categories' => [$subCategory->id],
                 'attributes' => [
                     ['key' => 'Size', 'value' => 'Large'],
@@ -185,6 +201,13 @@ class ProductWebTest extends TestCase
             'price' => 120,
             'discount_amount' => 10,
             'quantity' => 8,
+        ]);
+        $this->assertDatabaseMissing('product_variants', ['id' => $oldVariant->id]);
+        $this->assertDatabaseHas('product_variants', [
+            'product_id' => $product->id,
+            'size' => 'L',
+            'color' => 'أزرق',
+            'quantity' => 5,
         ]);
         $this->assertDatabaseMissing('product_attributes', [
             'product_id' => $product->id,

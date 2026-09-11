@@ -13,6 +13,7 @@ use Database\Seeders\TestData\OrderSeeder;
 use Database\Seeders\TestData\ProductAttributeSeeder;
 use Database\Seeders\TestData\ProductSeeder;
 use Database\Seeders\TestData\ProductSubCategorySeeder;
+use Database\Seeders\TestData\ProductVariantSeeder;
 use Database\Seeders\TestData\RoleSeeder;
 use Database\Seeders\TestData\SubCategorySeeder;
 use Database\Seeders\TestData\SubOrderSeeder;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             SubCategorySeeder::class,
             ProductSeeder::class,
+            ProductVariantSeeder::class,
             ProductSubCategorySeeder::class,
             ProductAttributeSeeder::class,
             CouponSeeder::class,
