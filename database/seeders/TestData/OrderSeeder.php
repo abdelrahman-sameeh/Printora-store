@@ -15,7 +15,7 @@ class OrderSeeder extends Seeder
         $orders = [
             [
                 'buyer_email' => 'buyer1@gmail.com',
-                'products' => ['Classic Burgundy T-Shirt', 'Essential Stripe T-Shirt'],
+                'products' => ['تيشيرت كلاسيك نبيتي', 'تيشيرت مخطط أساسي'],
                 'status' => 'processing',
                 'payment_status' => 'paid',
                 'payment_method' => 'card',
@@ -23,7 +23,7 @@ class OrderSeeder extends Seeder
             ],
             [
                 'buyer_email' => 'buyer2@gmail.com',
-                'products' => ['Women Casual Cotton T-Shirt', 'Kids Burgundy Sports T-Shirt'],
+                'products' => ['تيشيرت حريمي قطني كاجوال', 'تيشيرت رياضي نبيتي للأطفال'],
                 'status' => 'completed',
                 'payment_status' => 'paid',
                 'payment_method' => 'cash',

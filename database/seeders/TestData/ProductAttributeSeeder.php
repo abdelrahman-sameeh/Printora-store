@@ -11,25 +11,25 @@ class ProductAttributeSeeder extends Seeder
     public function run(): void
     {
         $attributes = [
-            'Classic Burgundy T-Shirt' => [
-                ['Color', 'Burgundy'],
-                ['Size', 'M, L, XL'],
-                ['Material', '100% Cotton'],
+            'تيشيرت كلاسيك نبيتي' => [
+                ['اللون', 'نبيتي'],
+                ['المقاس', 'متوسط، كبير، كبير جدًا'],
+                ['الخامة', 'قطن ١٠٠٪'],
             ],
-            'Essential Stripe T-Shirt' => [
-                ['Color', 'Burgundy'],
-                ['Size', 'S, M, L'],
-                ['Fit', 'Regular'],
+            'تيشيرت مخطط أساسي' => [
+                ['اللون', 'نبيتي'],
+                ['المقاس', 'صغير، متوسط، كبير'],
+                ['القصة', 'عادية'],
             ],
-            'Women Casual Cotton T-Shirt' => [
-                ['Color', 'Burgundy'],
-                ['Size', 'S, M, L'],
-                ['Material', 'Cotton'],
+            'تيشيرت حريمي قطني كاجوال' => [
+                ['اللون', 'نبيتي'],
+                ['المقاس', 'صغير، متوسط، كبير'],
+                ['الخامة', 'قطن'],
             ],
-            'Kids Burgundy Sports T-Shirt' => [
-                ['Color', 'Burgundy'],
-                ['Size', '6-12 Years'],
-                ['Fit', 'Sports'],
+            'تيشيرت رياضي نبيتي للأطفال' => [
+                ['اللون', 'نبيتي'],
+                ['المقاس', 'من ٦ إلى ١٢ سنة'],
+                ['القصة', 'رياضية'],
             ],
         ];
 

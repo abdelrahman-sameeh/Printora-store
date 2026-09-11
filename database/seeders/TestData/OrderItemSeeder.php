@@ -14,8 +14,8 @@ class OrderItemSeeder extends Seeder
     public function run(): void
     {
         $orderProducts = [
-            'buyer1@gmail.com' => ['Classic Burgundy T-Shirt', 'Essential Stripe T-Shirt'],
-            'buyer2@gmail.com' => ['Women Casual Cotton T-Shirt', 'Kids Burgundy Sports T-Shirt'],
+            'buyer1@gmail.com' => ['تيشيرت كلاسيك نبيتي', 'تيشيرت مخطط أساسي'],
+            'buyer2@gmail.com' => ['تيشيرت حريمي قطني كاجوال', 'تيشيرت رياضي نبيتي للأطفال'],
         ];
 
         foreach ($orderProducts as $buyerEmail => $productTitles) {

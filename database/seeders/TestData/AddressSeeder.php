@@ -16,10 +16,10 @@ class AddressSeeder extends Seeder
         Address::create([
             'user_id' => $buyer1->id,
             'country' => 'EG',
-            'city' => 'Cairo',
-            'street' => '15 Tahrir Square, Downtown',
+            'city' => 'القاهرة',
+            'street' => '١٥ ميدان التحرير، وسط البلد',
             'is_default' => true,
-            'note' => 'Next to the metro station',
+            'note' => 'بجوار محطة المترو',
             'latitude' => 30.0444,
             'longitude' => 31.2357,
         ]);
@@ -27,17 +27,17 @@ class AddressSeeder extends Seeder
         Address::create([
             'user_id' => $buyer1->id,
             'country' => 'EG',
-            'city' => 'Giza',
-            'street' => '22 Pyramids Road',
+            'city' => 'الجيزة',
+            'street' => '٢٢ شارع الهرم',
             'is_default' => false,
-            'note' => 'Near the mall',
+            'note' => 'بالقرب من المركز التجاري',
         ]);
 
         Address::create([
             'user_id' => $buyer2->id,
             'country' => 'EG',
-            'city' => 'Alexandria',
-            'street' => '5 Corniche Road',
+            'city' => 'الإسكندرية',
+            'street' => '٥ طريق الكورنيش',
             'is_default' => true,
         ]);
     }

@@ -11,9 +11,9 @@ class SubCategorySeeder extends Seeder
     public function run(): void
     {
         $subCategories = [
-            'Men Clothing' => ['Men T-Shirts', 'Men Casual Wear'],
-            'Women Clothing' => ['Women T-Shirts', 'Women Casual Wear'],
-            'Kids Clothing' => ['Kids T-Shirts', 'Kids Sportswear'],
+            'ملابس رجالي' => ['تيشيرتات رجالي', 'ملابس كاجوال رجالي'],
+            'ملابس حريمي' => ['تيشيرتات حريمي', 'ملابس كاجوال حريمي'],
+            'ملابس أطفال' => ['تيشيرتات أطفال', 'ملابس رياضية أطفال'],
         ];
 
         foreach ($subCategories as $categoryTitle => $titles) {

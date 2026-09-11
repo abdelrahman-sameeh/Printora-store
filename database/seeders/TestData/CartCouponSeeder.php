@@ -14,7 +14,7 @@ class CartCouponSeeder extends Seeder
     {
         $buyer = User::query()->where('email', 'buyer1@gmail.com')->firstOrFail();
         $cart = Cart::query()->where('user_id', $buyer->id)->firstOrFail();
-        $coupon = Coupon::query()->where('code', 'FASHION10')->firstOrFail();
+        $coupon = Coupon::query()->where('code', 'خصم_الموضة_١٠')->firstOrFail();
 
         CartCoupon::create([
             'cart_id' => $cart->id,

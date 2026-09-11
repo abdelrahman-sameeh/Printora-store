@@ -14,12 +14,12 @@ class CartItemSeeder extends Seeder
     {
         $cartItems = [
             'buyer1@gmail.com' => [
-                'Classic Burgundy T-Shirt' => 1,
-                'Essential Stripe T-Shirt' => 2,
+                'تيشيرت كلاسيك نبيتي' => 1,
+                'تيشيرت مخطط أساسي' => 2,
             ],
             'buyer2@gmail.com' => [
-                'Women Casual Cotton T-Shirt' => 1,
-                'Kids Burgundy Sports T-Shirt' => 1,
+                'تيشيرت حريمي قطني كاجوال' => 1,
+                'تيشيرت رياضي نبيتي للأطفال' => 1,
             ],
         ];
 

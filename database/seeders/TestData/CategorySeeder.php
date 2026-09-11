@@ -9,7 +9,7 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (['Men Clothing', 'Women Clothing', 'Kids Clothing'] as $title) {
+        foreach (['ملابس رجالي', 'ملابس حريمي', 'ملابس أطفال'] as $title) {
             Category::create(['title' => $title]);
         }
     }

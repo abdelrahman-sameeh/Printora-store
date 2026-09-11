@@ -12,10 +12,10 @@ class ProductSubCategorySeeder extends Seeder
     public function run(): void
     {
         $productSubCategories = [
-            'Classic Burgundy T-Shirt' => 'Men T-Shirts',
-            'Essential Stripe T-Shirt' => 'Men T-Shirts',
-            'Women Casual Cotton T-Shirt' => 'Women T-Shirts',
-            'Kids Burgundy Sports T-Shirt' => 'Kids Sportswear',
+            'تيشيرت كلاسيك نبيتي' => 'تيشيرتات رجالي',
+            'تيشيرت مخطط أساسي' => 'تيشيرتات رجالي',
+            'تيشيرت حريمي قطني كاجوال' => 'تيشيرتات حريمي',
+            'تيشيرت رياضي نبيتي للأطفال' => 'ملابس رياضية أطفال',
         ];
 
         foreach ($productSubCategories as $productTitle => $subCategoryTitle) {
