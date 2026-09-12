@@ -160,14 +160,14 @@ class CartService
                 ];
             }
 
-            if ($item->variant->quantity < $item->quantity) {
+            if ($item->variant->stock < $item->quantity) {
                 $errors[] = [
                     'item_id' => $item->id,
                     'product_id' => $item->product_id,
                     'type' => 'insufficient_stock',
-                    'message' => "المتاح من المقاس واللون المختارين {$item->variant->quantity} فقط.",
+                    'message' => "المتاح من المقاس واللون المختارين {$item->variant->stock} فقط.",
                     'requested_quantity' => $item->quantity,
-                    'available_quantity' => $item->variant->quantity,
+                    'available_quantity' => $item->variant->stock,
                 ];
             }
         }
@@ -214,7 +214,7 @@ class CartService
                     'id' => $item->variant->id,
                     'size' => $item->variant->size,
                     'color' => $item->variant->color,
-                    'stock' => $item->variant->quantity,
+                    'stock' => $item->variant->stock,
                 ],
                 'product' => [
                     'id' => $product->id,
@@ -228,7 +228,7 @@ class CartService
                         'id' => $variant->id,
                         'size' => $variant->size,
                         'color' => $variant->color,
-                        'stock' => $variant->quantity,
+                        'stock' => $variant->stock,
                     ])->values()->all(),
                 ],
             ];
@@ -296,9 +296,9 @@ class CartService
             throw ValidationException::withMessages(['quantity' => 'هذا المنتج غير متاح حاليًا.']);
         }
 
-        if ($quantity > $variant->quantity) {
+        if ($quantity > $variant->stock) {
             throw ValidationException::withMessages([
-                'quantity' => "الكمية المتاحة من {$product->title} بالمقاس {$variant->size} واللون {$variant->color} هي {$variant->quantity} فقط.",
+                'quantity' => "الكمية المتاحة من {$product->title} بالمقاس {$variant->size} واللون {$variant->color} هي {$variant->stock} فقط.",
             ]);
         }
     }

@@ -29,6 +29,7 @@
                 <th class="p-3">المنتجات</th>
                 <th class="p-3">الإجمالي</th>
                 <th class="p-3">الحالة</th>
+                <th class="p-3">حالة الدفع</th>
                 <th class="p-3 text-end">التفاصيل</th>
               </tr>
             </thead>
@@ -40,6 +41,9 @@
                   <td class="p-3">{{ $subOrder->items->sum('quantity') }}</td>
                   <td class="p-3 fw-semibold">{{ number_format((float) $subOrder->total_price, 2) }} جنيه</td>
                   <td class="p-3">@include('orders._status', ['status' => $subOrder->status])</td>
+                  <td class="p-3">
+                    @include('orders._payment_status', ['status' => $subOrder->order->payment_status])
+                  </td>
                   <td class="p-3 text-end">
                     <a class="btn btn-outline-primary" href="{{ route('seller.orders.show', $subOrder) }}">عرض</a>
                   </td>

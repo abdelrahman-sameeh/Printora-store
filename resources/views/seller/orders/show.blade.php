@@ -64,6 +64,28 @@
           </div>
         </div>
 
+        @php
+          $paymentMethodLabels = [
+              'cash' => 'الدفع عند الاستلام',
+              'card' => 'بطاقة بنكية',
+              'wallet' => 'محفظة إلكترونية',
+          ];
+        @endphp
+
+        <div class="dashboard-card card border-0 mb-4">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">بيانات الدفع</h2>
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+              <span class="text-muted-custom">حالة الدفع</span>
+              @include('orders._payment_status', ['status' => $subOrder->order->payment_status])
+            </div>
+            <div class="d-flex justify-content-between align-items-center gap-3">
+              <span class="text-muted-custom">طريقة الدفع</span>
+              <strong>{{ $paymentMethodLabels[$subOrder->order->payment_method] ?? $subOrder->order->payment_method }}</strong>
+            </div>
+          </div>
+        </div>
+
         <div class="dashboard-card card border-0">
           <div class="card-body p-4">
             <h2 class="h5 fw-bold mb-3">تحديث الحالة</h2>

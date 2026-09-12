@@ -21,12 +21,12 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'discount_amount' => $this->discount_amount,
             'price_after_discount' => $this->price_after_discount,
-            'quantity' => $this->quantity,
+            'stock' => $this->stock,
             'variants' => $this->variants->map(fn ($variant) => [
                 'id' => $variant->id,
                 'size' => $variant->size,
                 'color' => $variant->color,
-                'quantity' => $variant->quantity,
+                'stock' => $variant->stock,
             ]),
             'cover_image' => url($this->cover_image),
             'sub_categories' => $this->sub_categories->map(function ($sub) {

@@ -23,7 +23,7 @@ class UpdateProductRequest extends FormRequest
             'variants' => ['sometimes', 'required', 'array', 'min:1'],
             'variants.*.size' => ['required', 'string', 'max:30'],
             'variants.*.color' => ['required', 'string', 'max:50'],
-            'variants.*.quantity' => ['required', 'integer', 'min:0'],
+            'variants.*.stock' => ['required', 'integer', 'min:0'],
             'product_pictures' => 'sometimes|nullable|array',
             'product_pictures.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             'sub_categories' => 'sometimes|array|min:1',

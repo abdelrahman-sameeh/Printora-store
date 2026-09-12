@@ -4,7 +4,7 @@
 
 @section('content')
   @php
-    $variantRows = old('variants', [['size' => 'M', 'color' => '', 'quantity' => 0]]);
+    $variantRows = old('variants', [['size' => 'M', 'color' => '', 'stock' => 0]]);
   @endphp
 
   <div class="container py-5">

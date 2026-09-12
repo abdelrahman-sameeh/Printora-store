@@ -17,7 +17,11 @@ class StorefrontWebTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('action="'.route('products.search').'"', false);
+            ->assertSee('action="'.route('products.search').'"', false)
+            ->assertSee('متجر Printora الرسمي')
+            ->assertSee('ستايلك يبدأ من هنا')
+            ->assertDontSee('متجر متعدد البائعين')
+            ->assertDontSee('بائعين مختلفين');
     }
 
     public function test_search_page_searches_active_products(): void
@@ -29,7 +33,6 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/headphones.png',
             'price' => 800,
             'discount_amount' => 50,
-            'quantity' => 5,
         ]);
         $seller->products()->create([
             'title' => 'Coffee Maker',
@@ -37,7 +40,6 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/coffee.png',
             'price' => 500,
             'discount_amount' => 0,
-            'quantity' => 2,
         ]);
         $seller->products()->create([
             'title' => 'Wireless Mouse',
@@ -45,7 +47,6 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/mouse.png',
             'price' => 300,
             'discount_amount' => 0,
-            'quantity' => 4,
             'is_active' => false,
         ]);
 
@@ -72,7 +73,6 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/device.png',
             'price' => 1200,
             'discount_amount' => 0,
-            'quantity' => 3,
         ]);
         $product->attributes()->create(['key' => 'color', 'value' => 'Midnight Black']);
         $product->sub_categories()->attach($subCategory);
@@ -106,8 +106,8 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/premium-shoes.png',
             'price' => 500,
             'discount_amount' => 200,
-            'quantity' => 4,
         ]);
+        $matchingProduct->variants()->create(['size' => 'M', 'color' => 'أسود', 'stock' => 4]);
         $matchingProduct->sub_categories()->attach($subCategory);
 
         $cheapProduct = $seller->products()->create([
@@ -116,8 +116,8 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/basic-shoes.png',
             'price' => 150,
             'discount_amount' => 20,
-            'quantity' => 5,
         ]);
+        $cheapProduct->variants()->create(['size' => 'M', 'color' => 'أسود', 'stock' => 5]);
         $cheapProduct->sub_categories()->attach($subCategory);
 
         $outOfStockProduct = $seller->products()->create([
@@ -126,8 +126,8 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/limited-shoes.png',
             'price' => 320,
             'discount_amount' => 20,
-            'quantity' => 0,
         ]);
+        $outOfStockProduct->variants()->create(['size' => 'M', 'color' => 'أسود', 'stock' => 0]);
         $outOfStockProduct->sub_categories()->attach($subCategory);
 
         $otherProduct = $seller->products()->create([
@@ -136,8 +136,8 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/kitchen.png',
             'price' => 300,
             'discount_amount' => 50,
-            'quantity' => 2,
         ]);
+        $otherProduct->variants()->create(['size' => 'M', 'color' => 'أسود', 'stock' => 2]);
         $otherProduct->sub_categories()->attach($otherSubCategory);
 
         $this->get(route('products.search', ['category_id' => $category->id]))
@@ -188,13 +188,12 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/public.png',
             'price' => 250,
             'discount_amount' => 25,
-            'quantity' => 7,
         ]);
         $activeProduct->attributes()->create(['key' => 'size', 'value' => 'Medium']);
         $activeProduct->variants()->create([
             'size' => 'M',
             'color' => 'أسود',
-            'quantity' => 7,
+            'stock' => 7,
         ]);
         $inactiveProduct = $seller->products()->create([
             'title' => 'Hidden Product',
@@ -202,7 +201,6 @@ class StorefrontWebTest extends TestCase
             'cover_image' => '/storage/products/covers/hidden.png',
             'price' => 100,
             'discount_amount' => 0,
-            'quantity' => 1,
             'is_active' => false,
         ]);
 
@@ -233,11 +231,10 @@ class StorefrontWebTest extends TestCase
             'description' => 'قميص متاح بألوان ومقاسات مختلفة.',
             'price' => 250,
             'discount_amount' => 0,
-            'quantity' => 5,
         ]);
         $product->variants()->createMany([
-            ['size' => 'M', 'color' => 'أسود', 'quantity' => 3],
-            ['size' => 'L', 'color' => 'أزرق', 'quantity' => 2],
+            ['size' => 'M', 'color' => 'أسود', 'stock' => 3],
+            ['size' => 'L', 'color' => 'أزرق', 'stock' => 2],
         ]);
 
         $this->actingAs($buyer)

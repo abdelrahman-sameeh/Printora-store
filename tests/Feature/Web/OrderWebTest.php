@@ -87,6 +87,8 @@ class OrderWebTest extends TestCase
             ->get(route('seller.orders.index'))
             ->assertOk()
             ->assertSee('طلبات المنتجات')
+            ->assertSee('حالة الدفع')
+            ->assertSee('في انتظار الدفع')
             ->assertSee($buyer->first_name);
 
         $this->actingAs($seller)
@@ -94,7 +96,10 @@ class OrderWebTest extends TestCase
             ->assertOk()
             ->assertSee('تيشيرت طلب Web')
             ->assertSee('XL')
-            ->assertSee('كحلي');
+            ->assertSee('كحلي')
+            ->assertSee('بيانات الدفع')
+            ->assertSee('في انتظار الدفع')
+            ->assertSee('الدفع عند الاستلام');
 
         $this->actingAs($seller)
             ->put(route('seller.orders.status.update', $subOrder), ['status' => 'shipped'])
@@ -114,14 +119,13 @@ class OrderWebTest extends TestCase
             'description' => 'وصف المنتج المستخدم في اختبار طلبات الويب.',
             'price' => 100,
             'discount_amount' => 0,
-            'quantity' => 10,
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
         $variant = $product->variants()->create([
             'size' => 'XL',
             'color' => 'كحلي',
-            'quantity' => 10,
+            'stock' => 10,
         ]);
         $address = Address::create([
             'user_id' => $buyer->id,

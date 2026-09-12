@@ -13,7 +13,7 @@
     $variantRows = old('variants', $product->variants->map(fn($variant) => [
       'size' => $variant->size,
       'color' => $variant->color,
-      'quantity' => $variant->quantity,
+      'stock' => $variant->stock,
     ])->all());
   @endphp
 

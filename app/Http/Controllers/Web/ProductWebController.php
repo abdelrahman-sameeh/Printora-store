@@ -20,7 +20,7 @@ class ProductWebController extends Controller
     public function index(Request $request): View
     {
         return view('products.index', [
-            'products' => $request->user()->products()->latest()->paginate(10),
+            'products' => $request->user()->products()->withSum('variants', 'stock')->latest()->paginate(10),
         ]);
     }
 

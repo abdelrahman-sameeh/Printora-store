@@ -28,7 +28,6 @@ class ProductService
                 'description' => $data['description'],
                 'price' => $data['price'],
                 'discount_amount' => $data['discount_amount'] ?? 0,
-                'quantity' => collect($data['variants'])->sum('quantity'),
             ]);
 
             /** @var UploadedFile $coverImage */
@@ -96,7 +95,6 @@ class ProductService
             if (array_key_exists('variants', $data)) {
                 $product->variants()->delete();
                 $product->variants()->createMany($this->variantRows($data['variants']));
-                $product->update(['quantity' => collect($data['variants'])->sum('quantity')]);
             }
 
             if (array_key_exists('sub_categories', $data)) {
@@ -140,7 +138,7 @@ class ProductService
             ->map(fn (array $variant): array => [
                 'size' => trim($variant['size']),
                 'color' => trim($variant['color']),
-                'quantity' => $variant['quantity'],
+                'stock' => $variant['stock'],
             ])
             ->all();
     }

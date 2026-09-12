@@ -13,7 +13,7 @@ use Str;
  * @property string $description
  * @property string|null $cover_image
  * @property string $price
- * @property int $quantity
+ * @property-read int $stock
  * @property int $seller_id
  * @property int $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -34,14 +34,13 @@ class Product extends Model
 {
     public $table = 'products';
 
-    protected $appends = ['cover_image_url', 'price_after_discount'];
+    protected $appends = ['cover_image_url', 'price_after_discount', 'stock'];
 
     protected $fillable = [
         'title',
         'description',
         'price',
         'discount_amount',
-        'quantity',
         'seller_id',
         'cover_image',
         'is_active',
@@ -63,6 +62,19 @@ class Product extends Model
         $discount = (float) ($this->discount_amount ?? 0);
 
         return max(0, round($price - $discount, 2));
+    }
+
+    public function getStockAttribute(): int
+    {
+        if (array_key_exists('variants_sum_stock', $this->attributes)) {
+            return (int) $this->attributes['variants_sum_stock'];
+        }
+
+        if ($this->relationLoaded('variants')) {
+            return (int) $this->variants->sum('stock');
+        }
+
+        return (int) $this->variants()->sum('stock');
     }
 
     public static function booted()

@@ -44,11 +44,10 @@ class OrderApiTest extends TestCase
         ]);
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'quantity' => 8,
             'sold_count' => 2,
         ]);
         $this->assertDatabaseHas('coupons', ['id' => $coupon->id, 'used_count' => 1]);
-        $this->assertDatabaseHas('product_variants', ['id' => $variant->id, 'quantity' => 8]);
+        $this->assertDatabaseHas('product_variants', ['id' => $variant->id, 'stock' => 8]);
         $this->assertDatabaseCount('cart_items', 0);
         $this->assertDatabaseCount('cart_coupons', 0);
 
@@ -120,14 +119,13 @@ class OrderApiTest extends TestCase
             'description' => 'وصف المنتج المستخدم في اختبار إنشاء الطلب.',
             'price' => 100,
             'discount_amount' => 0,
-            'quantity' => 10,
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
         $variant = $product->variants()->create([
             'size' => 'L',
             'color' => 'أسود',
-            'quantity' => 10,
+            'stock' => 10,
         ]);
         $address = Address::create([
             'user_id' => $buyer->id,

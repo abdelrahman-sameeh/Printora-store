@@ -37,7 +37,7 @@ class CartApiTest extends TestCase
         $largeBlue = $product->variants()->create([
             'size' => 'L',
             'color' => 'أزرق',
-            'quantity' => 3,
+            'stock' => 3,
         ]);
         $cartItem = $buyer->cart()->firstOrFail()->items()->firstOrFail();
 
@@ -84,14 +84,13 @@ class CartApiTest extends TestCase
             'description' => 'وصف مناسب للمنتج المستخدم في اختبار السلة.',
             'price' => 75,
             'discount_amount' => 0,
-            'quantity' => 10,
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
         $product->variants()->create([
             'size' => 'M',
             'color' => 'أسود',
-            'quantity' => 10,
+            'stock' => 10,
         ]);
 
         return $product;

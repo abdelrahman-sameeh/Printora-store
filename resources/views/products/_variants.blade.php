@@ -25,9 +25,9 @@
             placeholder="اللون، مثل أسود" required>
         </div>
         <div class="col-md-2">
-          <input class="form-control @error("variants.$index.quantity") is-invalid @enderror"
-            name="variants[{{ $index }}][quantity]" type="number" min="0"
-            value="{{ $variant['quantity'] ?? 0 }}" aria-label="الكمية" required>
+          <input class="form-control @error("variants.$index.stock") is-invalid @enderror"
+            name="variants[{{ $index }}][stock]" type="number" min="0"
+            value="{{ $variant['stock'] ?? 0 }}" aria-label="المخزون" required>
         </div>
         <div class="col-md-2 d-grid">
           <button class="btn btn-outline-danger remove-variant" type="button">حذف</button>

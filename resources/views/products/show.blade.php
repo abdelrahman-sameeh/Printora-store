@@ -73,7 +73,7 @@
                     <tr>
                       <td>{{ $variant->size }}</td>
                       <td>{{ $variant->color }}</td>
-                      <td class="text-end">{{ $variant->quantity }}</td>
+                      <td class="text-end">{{ $variant->stock }}</td>
                     </tr>
                   @endforeach
                 </tbody>
@@ -102,7 +102,7 @@
 
             <div class="d-flex justify-content-between py-3 border-top">
               <span class="text-muted-custom">المخزون</span>
-              <strong>{{ $product->quantity }} قطعة</strong>
+              <strong>{{ $product->stock }} قطعة</strong>
             </div>
             <div class="d-flex justify-content-between py-3 border-top">
               <span class="text-muted-custom">الحالة</span>

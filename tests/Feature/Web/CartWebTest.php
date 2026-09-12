@@ -59,7 +59,7 @@ class CartWebTest extends TestCase
         $largeBlue = $product->variants()->create([
             'size' => 'L',
             'color' => 'أزرق',
-            'quantity' => 1,
+            'stock' => 1,
         ]);
 
         $this->actingAs($buyer)
@@ -120,7 +120,7 @@ class CartWebTest extends TestCase
         $largeBlue = $product->variants()->create([
             'size' => 'L',
             'color' => 'أزرق',
-            'quantity' => 4,
+            'stock' => 4,
         ]);
         $item = $buyer->cart()->create()->items()->create([
             'product_id' => $product->id,
@@ -260,14 +260,13 @@ class CartWebTest extends TestCase
             'description' => 'وصف مناسب للمنتج المستخدم في اختبار السلة.',
             'price' => $price,
             'discount_amount' => 0,
-            'quantity' => 10,
             'seller_id' => $seller->id,
             'is_active' => true,
         ]);
         $product->variants()->create([
             'size' => 'M',
             'color' => 'أسود',
-            'quantity' => 10,
+            'stock' => 10,
         ]);
 
         return $product;

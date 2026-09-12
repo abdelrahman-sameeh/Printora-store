@@ -58,9 +58,9 @@ class OrderService
                     ]);
                 }
 
-                if ($variant->quantity < $item->quantity) {
+                if ($variant->stock < $item->quantity) {
                     throw ValidationException::withMessages([
-                        'cart' => "الكمية المتاحة من {$product->title} بالمقاس {$variant->size} واللون {$variant->color} هي {$variant->quantity} فقط.",
+                        'cart' => "الكمية المتاحة من {$product->title} بالمقاس {$variant->size} واللون {$variant->color} هي {$variant->stock} فقط.",
                     ]);
                 }
 
@@ -140,8 +140,7 @@ class OrderService
                         ])->all()
                     );
 
-                    $item->variant->decrement('quantity', $item->quantity);
-                    $product->quantity -= $item->quantity;
+                    $item->variant->decrement('stock', $item->quantity);
                     $product->sold_count += $item->quantity;
                     $product->save();
                 }

@@ -18,6 +18,7 @@ class StorefrontController extends Controller
         $products = Product::query()
             ->where('is_active', true)
             ->with('sub_categories.category')
+            ->withSum('variants', 'stock')
             ->latest()
             ->paginate(12);
 
@@ -62,6 +63,7 @@ class StorefrontController extends Controller
         $products = Product::query()
             ->where('is_active', true)
             ->with('sub_categories.category')
+            ->withSum('variants', 'stock')
             ->when($filters['q'] !== '', function ($query) use ($filters) {
                 $like = "%{$filters['q']}%";
 
@@ -104,7 +106,10 @@ class StorefrontController extends Controller
             ->when(isset($filters['min_rating']), function ($query) use ($filters) {
                 $query->where('rating_avg', '>=', $filters['min_rating']);
             })
-            ->when(! empty($filters['in_stock']), fn ($query) => $query->where('quantity', '>', 0))
+            ->when(! empty($filters['in_stock']), fn ($query) => $query->whereHas(
+                'variants',
+                fn ($query) => $query->where('stock', '>', 0)
+            ))
             ->when(! empty($filters['on_sale']), fn ($query) => $query->where('discount_amount', '>', 0))
             ->when($filters['sort'] === 'price_asc', fn ($query) => $query->orderByRaw('(price - discount_amount) asc'))
             ->when($filters['sort'] === 'price_desc', fn ($query) => $query->orderByRaw('(price - discount_amount) desc'))

@@ -11,11 +11,11 @@ class ProductVariant extends Model
         'product_id',
         'size',
         'color',
-        'quantity',
+        'stock',
     ];
 
     protected $casts = [
-        'quantity' => 'integer',
+        'stock' => 'integer',
     ];
 
     public function product(): BelongsTo

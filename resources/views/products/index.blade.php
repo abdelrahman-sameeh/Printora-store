@@ -51,7 +51,7 @@
                     <span class="badge text-bg-danger">خصم
                       {{ number_format($product->discount_amount, 2) }} جنيه</span>
                   @endif
-                  <span class="text-muted-custom">المخزون: {{ $product->quantity }}</span>
+                  <span class="text-muted-custom">المخزون: {{ $product->stock }}</span>
                 </div>
 
                 <div class="row g-2 mt-4 pt-3 border-top position-relative z-2">

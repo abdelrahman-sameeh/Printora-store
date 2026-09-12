@@ -53,8 +53,8 @@ class ProductWebTest extends TestCase
                 'price' => '199.99',
                 'discount_amount' => 20,
                 'variants' => [
-                    ['size' => 'M', 'color' => 'أسود', 'quantity' => 6],
-                    ['size' => 'L', 'color' => 'أسود', 'quantity' => 4],
+                    ['size' => 'M', 'color' => 'أسود', 'stock' => 6],
+                    ['size' => 'L', 'color' => 'أسود', 'stock' => 4],
                 ],
                 'cover_image' => UploadedFile::fake()->createWithContent(
                     'cover.png',
@@ -77,12 +77,12 @@ class ProductWebTest extends TestCase
 
         $product = $seller->products()->firstOrFail();
         $this->assertSame(179.99, $product->price_after_discount);
-        $this->assertSame(10, $product->quantity);
+        $this->assertSame(10, $product->stock);
         $this->assertDatabaseHas('product_variants', [
             'product_id' => $product->id,
             'size' => 'M',
             'color' => 'أسود',
-            'quantity' => 6,
+            'stock' => 6,
         ]);
         $this->assertDatabaseHas('product_sub_category', [
             'product_id' => $product->id,
@@ -121,11 +121,10 @@ class ProductWebTest extends TestCase
             'cover_image' => '/storage/products/covers/laptop.png',
             'price' => 1500,
             'discount_amount' => 100,
-            'quantity' => 6,
         ]);
         $product->sub_categories()->attach($subCategory);
         $product->attributes()->create(['key' => 'ram', 'value' => '32 GB']);
-        $product->variants()->create(['size' => 'L', 'color' => 'أسود', 'quantity' => 6]);
+        $product->variants()->create(['size' => 'L', 'color' => 'أسود', 'stock' => 6]);
         $product->pictures()->create(['picture' => '/storage/products/gallery/laptop-side.png']);
 
         $this->actingAs($seller)
@@ -165,11 +164,10 @@ class ProductWebTest extends TestCase
             'cover_image' => '/storage/products/covers/old.png',
             'price' => 100,
             'discount_amount' => 0,
-            'quantity' => 4,
         ]);
         $product->sub_categories()->attach($subCategory);
         $product->attributes()->create(['key' => 'color', 'value' => 'Red']);
-        $oldVariant = $product->variants()->create(['size' => 'M', 'color' => 'أحمر', 'quantity' => 4]);
+        $oldVariant = $product->variants()->create(['size' => 'M', 'color' => 'أحمر', 'stock' => 4]);
 
         $this->actingAs($seller)
             ->get(route('seller.products.edit', $product))
@@ -183,8 +181,8 @@ class ProductWebTest extends TestCase
                 'price' => 120,
                 'discount_amount' => 10,
                 'variants' => [
-                    ['size' => 'L', 'color' => 'أزرق', 'quantity' => 5],
-                    ['size' => 'XL', 'color' => 'أسود', 'quantity' => 3],
+                    ['size' => 'L', 'color' => 'أزرق', 'stock' => 5],
+                    ['size' => 'XL', 'color' => 'أسود', 'stock' => 3],
                 ],
                 'sub_categories' => [$subCategory->id],
                 'attributes' => [
@@ -200,14 +198,14 @@ class ProductWebTest extends TestCase
             'title' => 'Updated Shirt',
             'price' => 120,
             'discount_amount' => 10,
-            'quantity' => 8,
         ]);
+        $this->assertSame(8, $product->refresh()->stock);
         $this->assertDatabaseMissing('product_variants', ['id' => $oldVariant->id]);
         $this->assertDatabaseHas('product_variants', [
             'product_id' => $product->id,
             'size' => 'L',
             'color' => 'أزرق',
-            'quantity' => 5,
+            'stock' => 5,
         ]);
         $this->assertDatabaseMissing('product_attributes', [
             'product_id' => $product->id,
@@ -244,7 +242,6 @@ class ProductWebTest extends TestCase
             'cover_image' => '/storage/products/covers/delete-cover.png',
             'price' => 50,
             'discount_amount' => 0,
-            'quantity' => 2,
         ]);
         $product->pictures()->create([
             'picture' => '/storage/products/gallery/delete-gallery.png',
@@ -282,7 +279,6 @@ class ProductWebTest extends TestCase
             'cover_image' => '/storage/products/covers/private.png',
             'price' => 75,
             'discount_amount' => 0,
-            'quantity' => 3,
         ]);
 
         $this->actingAs($otherSeller)

@@ -4,14 +4,14 @@
 
 @section('content')
     @php
-        $availableVariants = $product->variants->where('quantity', '>', 0)->values();
+        $availableVariants = $product->variants->where('stock', '>', 0)->values();
         $selectedVariant = $availableVariants->firstWhere('id', (int) old('product_variant_id'))
             ?? $availableVariants->first();
         $variantOptions = $availableVariants->map(fn ($variant) => [
             'id' => $variant->id,
             'size' => $variant->size,
             'color' => $variant->color,
-            'stock' => $variant->quantity,
+            'stock' => $variant->stock,
         ])->values();
     @endphp
 
@@ -66,8 +66,8 @@
 
                         <div class="d-flex justify-content-between py-3 border-top">
                             <span class="text-muted-custom">المتوفر</span>
-                            @if ($product->quantity > 0)
-                                <strong>{{ $product->quantity }} قطعة</strong>
+                            @if ($product->stock > 0)
+                                <strong>{{ $product->stock }} قطعة</strong>
                             @else
                                 <span class="badge text-bg-secondary">نفد المخزون</span>
                             @endif
@@ -141,7 +141,7 @@
                                                 aria-label="تقليل الكمية">−</button>
                                             <input class="form-control text-center @error('quantity') is-invalid @enderror"
                                                 id="variant-quantity" name="quantity" type="number" min="1"
-                                                max="{{ $selectedVariant?->quantity }}" value="{{ old('quantity', 1) }}"
+                                                max="{{ $selectedVariant?->stock }}" value="{{ old('quantity', 1) }}"
                                                 inputmode="numeric" aria-label="الكمية" required>
                                             <button class="btn btn-light quantity-action" type="button" data-action="increase"
                                                 aria-label="زيادة الكمية">+</button>
@@ -157,7 +157,7 @@
                                 </form>
                             @endif
                         @else
-                            @if ($product->quantity > 0)
+                            @if ($product->stock > 0)
                                 <a class="btn btn-brand w-100 mt-3" href="{{ route('login') }}">سجل الدخول للإضافة للسلة</a>
                             @endif
                         @endauth

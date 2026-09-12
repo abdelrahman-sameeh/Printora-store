@@ -29,7 +29,7 @@ class CartItemSeeder extends Seeder
 
             foreach ($products as $productTitle => $quantity) {
                 $product = Product::query()->where('title', $productTitle)->firstOrFail();
-                $variant = $product->variants()->where('quantity', '>=', $quantity)->firstOrFail();
+                $variant = $product->variants()->where('stock', '>=', $quantity)->firstOrFail();
 
                 CartItem::create([
                     'cart_id' => $cart->id,

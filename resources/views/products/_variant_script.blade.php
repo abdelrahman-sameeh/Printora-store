@@ -21,8 +21,8 @@
               placeholder="اللون، مثل أسود" required>
           </div>
           <div class="col-md-2">
-            <input class="form-control" name="variants[${index}][quantity]" type="number"
-              min="0" value="0" aria-label="الكمية" required>
+            <input class="form-control" name="variants[${index}][stock]" type="number"
+              min="0" value="0" aria-label="المخزون" required>
           </div>
           <div class="col-md-2 d-grid">
             <button class="btn btn-outline-danger remove-variant" type="button">حذف</button>

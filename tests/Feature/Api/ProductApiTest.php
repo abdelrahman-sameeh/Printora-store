@@ -8,6 +8,7 @@ use App\Models\SubCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -15,6 +16,13 @@ use Tests\TestCase;
 class ProductApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_stock_is_stored_only_on_product_variants(): void
+    {
+        $this->assertFalse(Schema::hasColumn('products', 'quantity'));
+        $this->assertTrue(Schema::hasColumn('product_variants', 'stock'));
+        $this->assertFalse(Schema::hasColumn('product_variants', 'quantity'));
+    }
 
     public function test_seller_can_create_and_update_product_variants_through_the_api(): void
     {
@@ -40,23 +48,23 @@ class ProductApiTest extends TestCase
             'cover_image' => $this->fakeImage(),
             'sub_categories' => [$subCategory->id],
             'variants' => [
-                ['size' => 'M', 'color' => 'أسود', 'quantity' => 5],
-                ['size' => 'L', 'color' => 'أبيض', 'quantity' => 3],
+                ['size' => 'M', 'color' => 'أسود', 'stock' => 5],
+                ['size' => 'L', 'color' => 'أبيض', 'stock' => 3],
             ],
         ])
             ->assertCreated()
-            ->assertJsonPath('data.quantity', 8)
-            ->assertJsonFragment(['size' => 'M', 'color' => 'أسود', 'quantity' => 5])
-            ->assertJsonFragment(['size' => 'L', 'color' => 'أبيض', 'quantity' => 3]);
+            ->assertJsonPath('data.stock', 8)
+            ->assertJsonFragment(['size' => 'M', 'color' => 'أسود', 'stock' => 5])
+            ->assertJsonFragment(['size' => 'L', 'color' => 'أبيض', 'stock' => 3]);
         $productId = $response->json('data.id');
 
         $this->patchJson("/api/products/{$productId}", [
             'variants' => [
-                ['size' => 'XL', 'color' => 'كحلي', 'quantity' => 4],
+                ['size' => 'XL', 'color' => 'كحلي', 'stock' => 4],
             ],
         ])
             ->assertOk()
-            ->assertJsonPath('quantity', 4)
+            ->assertJsonPath('stock', 4)
             ->assertJsonCount(1, 'variants')
             ->assertJsonPath('variants.0.size', 'XL')
             ->assertJsonPath('variants.0.color', 'كحلي');
@@ -69,7 +77,7 @@ class ProductApiTest extends TestCase
             'product_id' => $productId,
             'size' => 'XL',
             'color' => 'كحلي',
-            'quantity' => 4,
+            'stock' => 4,
         ]);
     }
 
@@ -95,8 +103,8 @@ class ProductApiTest extends TestCase
             'cover_image' => $this->fakeImage(),
             'sub_categories' => [$subCategory->id],
             'variants' => [
-                ['size' => 'M', 'color' => 'أسود', 'quantity' => 2],
-                ['size' => 'm', 'color' => ' أسود ', 'quantity' => 3],
+                ['size' => 'M', 'color' => 'أسود', 'stock' => 2],
+                ['size' => 'm', 'color' => ' أسود ', 'stock' => 3],
             ],
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()

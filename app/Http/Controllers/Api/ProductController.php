@@ -85,7 +85,9 @@ class ProductController
         $rating = $request->query('rating');
         $min_ratings = $request->query('min_ratings') ?? 0;
         $limit = $request->query('limit') ?? 10;
-        $query = Product::query();
+        $query = Product::query()
+            ->with('attributes', 'sub_categories.category', 'pictures', 'variants')
+            ->withSum('variants', 'stock');
 
         if (! is_null($word)) {
             $query->where(function ($q) use ($word) {

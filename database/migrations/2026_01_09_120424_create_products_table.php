@@ -19,8 +19,6 @@ return new class extends Migration
             $table->string('cover_image')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
-            // Cached total of all variant quantities.
-            $table->unsignedInteger('quantity')->default(0);
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->integer('sold_count')->default(0);
@@ -36,11 +34,11 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->string('size', 30);
             $table->string('color', 50);
-            $table->unsignedInteger('quantity')->default(0);
+            $table->unsignedInteger('stock')->default(0);
             $table->timestamps();
 
             $table->unique(['product_id', 'size', 'color']);
-            $table->index(['product_id', 'quantity']);
+            $table->index(['product_id', 'stock']);
         });
     }
 
