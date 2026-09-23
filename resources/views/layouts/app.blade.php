@@ -118,6 +118,96 @@
             background: var(--danger);
         }
 
+        .navbar-desktop-actions {
+            margin-inline-start: auto;
+        }
+
+        .navbar-desktop-home {
+            min-height: 2.85rem;
+            padding: .65rem 1.1rem;
+            color: var(--muted);
+            border: 1px solid rgba(16, 24, 40, .07);
+            border-radius: .9rem;
+            background: rgba(248, 249, 252, .9);
+            box-shadow: none;
+        }
+
+        .navbar-desktop-home:hover,
+        .navbar-desktop-home:focus,
+        .navbar-desktop-home.is-active {
+            color: var(--brand-dark);
+            border-color: rgba(91, 76, 240, .14);
+            background: var(--brand-soft);
+            transform: none;
+        }
+
+        .navbar-menu-trigger {
+            min-width: 8rem;
+            min-height: 2.85rem;
+            border: 0;
+            border-radius: .9rem;
+            background: linear-gradient(135deg, var(--brand), #796cf7);
+            box-shadow: 0 .5rem 1.25rem rgba(91, 76, 240, .24);
+        }
+
+        .navbar-menu-trigger:hover,
+        .navbar-menu-trigger:focus {
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand-dark), var(--brand));
+        }
+
+        .navbar-menu-dropdown .dropdown-menu {
+            min-width: 15rem;
+            padding: .6rem;
+            border: 1px solid rgba(16, 24, 40, .08);
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, .98);
+            box-shadow: 0 1rem 2.5rem rgba(16, 24, 40, .14);
+        }
+
+        .navbar-menu-dropdown .dropdown-item {
+            display: flex;
+            min-height: 2.7rem;
+            padding: .65rem .85rem;
+            color: var(--ink);
+            font-weight: 650;
+            border-radius: .7rem;
+            align-items: center;
+            gap: .65rem;
+        }
+
+        .navbar-menu-dropdown .dropdown-item .bi {
+            width: 1.2rem;
+            flex: 0 0 auto;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        .navbar-menu-dropdown .dropdown-item:hover,
+        .navbar-menu-dropdown .dropdown-item:focus {
+            color: var(--brand-dark);
+            background: var(--brand-soft);
+        }
+
+        .navbar-menu-dropdown .dropdown-item.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand), #796cf7);
+        }
+
+        .navbar-menu-dropdown .dropdown-logout {
+            width: 100%;
+            color: var(--danger-dark);
+            border: 0;
+            background: transparent;
+            text-align: start;
+        }
+
+        .navbar-menu-dropdown .dropdown-logout:hover,
+        .navbar-menu-dropdown .dropdown-logout:focus {
+            color: #fff;
+            background: var(--danger);
+        }
+
         .navbar-brand {
             min-width: 0;
         }
@@ -408,16 +498,74 @@
             </button>
 
             <div class="collapse navbar-collapse" id="mainNavbar">
-                <div class="navbar-actions d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 pt-3 pt-lg-0">
+                <div class="navbar-desktop-actions d-none d-lg-flex align-items-center gap-2">
+                    <a @class(['btn navbar-desktop-home', 'is-active' => request()->routeIs('home')])
+                        href="{{ route('home') }}"
+                        @if (request()->routeIs('home')) aria-current="page" @endif>
+                        <i class="bi bi-house-door" aria-hidden="true"></i>
+                        <span>الرئيسية</span>
+                    </a>
+                    <div class="dropdown navbar-menu-dropdown">
+                    <button class="btn btn-brand dropdown-toggle navbar-menu-trigger" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-grid" aria-hidden="true"></i>
+                        <span>القائمة</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a @class(['dropdown-item', 'active' => request()->routeIs('stores.index')])
+                                href="{{ route('stores.index') }}">
+                                <i class="bi bi-shop" aria-hidden="true"></i>
+                                <span>تصفح المتاجر</span>
+                            </a>
+                        </li>
+                        @auth
+                            @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
+                                <li>
+                                    <a @class(['dropdown-item', 'active' => request()->routeIs('orders.*')])
+                                        href="{{ route('orders.index') }}"><i class="bi bi-bag-check" aria-hidden="true"></i><span>طلباتي</span></a>
+                                </li>
+                                <li>
+                                    <a @class(['dropdown-item', 'active' => request()->routeIs('cart.*')])
+                                        href="{{ route('cart.index') }}"><i class="bi bi-cart3" aria-hidden="true"></i><span>السلة</span></a>
+                                </li>
+                            @endif
+                            <li>
+                                <a @class(['dropdown-item', 'active' => request()->routeIs('dashboard')])
+                                    href="{{ route('dashboard') }}"><i class="bi bi-person-circle" aria-hidden="true"></i><span>حسابي</span></a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button class="dropdown-item dropdown-logout" type="submit"><i class="bi bi-box-arrow-left" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
+                                </form>
+                            </li>
+                        @else
+                            <li>
+                                <a @class(['dropdown-item', 'active' => request()->routeIs('login*')])
+                                    href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>دخول</span></a>
+                            </li>
+                            <li>
+                                <a @class(['dropdown-item', 'active' => request()->routeIs('register*')])
+                                    href="{{ route('register') }}"><i class="bi bi-person-plus" aria-hidden="true"></i><span>حساب جديد</span></a>
+                            </li>
+                        @endauth
+                    </ul>
+                    </div>
+                </div>
+
+                <div class="navbar-actions d-flex d-lg-none flex-column align-items-stretch gap-2 pt-3">
                     <a
                     @class([
                         'btn px-3',
-                        'btn-brand' => request()->routeIs('home', 'stores.show'),
-                        'btn-light' => !request()->routeIs('home', 'stores.show'),
+                        'btn-brand' => request()->routeIs('home'),
+                        'btn-light' => !request()->routeIs('home'),
                     ])
                     href="{{ route('home') }}"
                     >
-                        الرئيسية
+                        <i class="bi bi-house-door" aria-hidden="true"></i>
+                        <span>الرئيسية</span>
                     </a>
                     <a @class([
                         'btn px-3',
@@ -425,26 +573,27 @@
                         'btn-light' => !request()->routeIs('stores.index'),
                     ]) href="{{ route('stores.index') }}"
                         @if (request()->routeIs('stores.index')) aria-current="page" @endif>
-                        المتاجر
+                        <i class="bi bi-shop" aria-hidden="true"></i>
+                        <span>المتاجر</span>
                     </a>
                 @auth
                     @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
                         <a @class(['btn px-3', 'btn-brand' => request()->routeIs('orders.*'), 'btn-light' => !request()->routeIs('orders.*')]) href="{{ route('orders.index') }}"
-                            @if (request()->routeIs('orders.*')) aria-current="page" @endif>طلباتي</a>
+                            @if (request()->routeIs('orders.*')) aria-current="page" @endif><i class="bi bi-bag-check" aria-hidden="true"></i><span>طلباتي</span></a>
                         <a @class(['btn px-3', 'btn-brand' => request()->routeIs('cart.*'), 'btn-light' => !request()->routeIs('cart.*')]) href="{{ route('cart.index') }}"
-                            @if (request()->routeIs('cart.*')) aria-current="page" @endif>السلة</a>
+                            @if (request()->routeIs('cart.*')) aria-current="page" @endif><i class="bi bi-cart3" aria-hidden="true"></i><span>السلة</span></a>
                     @endif
                     <a @class(['btn px-3', 'btn-brand' => request()->routeIs('dashboard'), 'btn-light' => !request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"
-                        @if (request()->routeIs('dashboard')) aria-current="page" @endif>حسابي</a>
+                        @if (request()->routeIs('dashboard')) aria-current="page" @endif><i class="bi bi-person-circle" aria-hidden="true"></i><span>حسابي</span></a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="btn btn-outline-danger px-3" type="submit">تسجيل الخروج</button>
+                        <button class="btn btn-outline-danger px-3" type="submit"><i class="bi bi-box-arrow-left" aria-hidden="true"></i><span>تسجيل الخروج</span></button>
                     </form>
                 @else
                     <a @class(['btn px-3', 'btn-brand' => request()->routeIs('login*'), 'btn-light' => !request()->routeIs('login*')]) href="{{ route('login') }}"
-                        @if (request()->routeIs('login*')) aria-current="page" @endif>دخول</a>
+                        @if (request()->routeIs('login*')) aria-current="page" @endif><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>دخول</span></a>
                     <a @class(['btn px-3', 'btn-brand' => request()->routeIs('register*'), 'btn-outline-primary' => !request()->routeIs('register*')]) href="{{ route('register') }}"
-                        @if (request()->routeIs('register*')) aria-current="page" @endif>حساب جديد</a>
+                        @if (request()->routeIs('register*')) aria-current="page" @endif><i class="bi bi-person-plus" aria-hidden="true"></i><span>حساب جديد</span></a>
                 @endauth
                 </div>
             </div>

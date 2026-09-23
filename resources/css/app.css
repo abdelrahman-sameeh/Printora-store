@@ -1,5 +1,6 @@
 @import '@fontsource-variable/readex-pro';
 @import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 .store-directory-hero {
     border: 1px solid rgba(91, 76, 240, .16);

@@ -22,7 +22,7 @@
                             <input class="form-control border-0 @error('q') is-invalid @enderror" id="store-search"
                                 name="q" type="search" value="{{ $query }}" placeholder="مثال: أحمد محمد"
                                 maxlength="100">
-                            <button class="btn btn-brand px-4" type="submit">بحث</button>
+                            <button class="btn btn-brand px-4" type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>بحث</span></button>
                         </div>
                         @error('q')
                             <div class="text-danger small mt-2">{{ $message }}</div>
@@ -49,7 +49,7 @@
                     <div class="fs-1 mb-3">🏪</div>
                     <h2 class="h4 fw-bold">لم نجد متجرًا بهذا الاسم</h2>
                     <p class="text-muted-custom mb-4">جرّب كتابة جزء من الاسم أو اعرض جميع المتاجر.</p>
-                    <a class="btn btn-brand" href="{{ route('stores.index') }}">عرض كل المتاجر</a>
+                    <a class="btn btn-brand" href="{{ route('stores.index') }}"><i class="bi bi-shop" aria-hidden="true"></i><span>عرض كل المتاجر</span></a>
                 </div>
             </div>
         @else
@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between gap-2">
                                     <span class="small text-muted-custom">تسوق من هذا البائع فقط</span>
-                                    <span class="btn btn-outline-primary px-3">زيارة المتجر</span>
+                                    <span class="btn btn-outline-primary px-3"><i class="bi bi-box-arrow-up-left" aria-hidden="true"></i><span>زيارة المتجر</span></span>
                                 </div>
                             </div>
                         </article>

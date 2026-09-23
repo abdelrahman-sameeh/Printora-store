@@ -40,7 +40,7 @@
                     <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
                         <input class="form-control border-0" id="product-search" name="q" type="search"
                             placeholder="ابحث عن هودي..." maxlength="100">
-                        <button class="btn btn-brand px-4" type="submit">بحث</button>
+                        <button class="btn btn-brand px-4" type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>بحث</span></button>
                     </div>
                     @error('q')
                         <div class="text-danger small mt-2">{{ $message }}</div>
@@ -48,8 +48,8 @@
                 </form>
 
                 <div class="d-flex flex-wrap gap-3">
-                    <a class="btn btn-brand px-4" href="{{ $storeSearchUrl }}">تسوق الآن</a>
-                    <a class="btn btn-outline-primary px-4" href="{{ route('stores.index') }}">تصفح المتاجر</a>
+                    <a class="btn btn-brand px-4" href="{{ $storeSearchUrl }}"><i class="bi bi-bag" aria-hidden="true"></i><span>تسوق الآن</span></a>
+                    <a class="btn btn-outline-primary px-4" href="{{ route('stores.index') }}"><i class="bi bi-shop" aria-hidden="true"></i><span>تصفح المتاجر</span></a>
                     @auth
                         <a class="btn btn-outline-dark px-4" href="{{ route('dashboard') }}">الذهاب إلى حسابي</a>
                     @else
