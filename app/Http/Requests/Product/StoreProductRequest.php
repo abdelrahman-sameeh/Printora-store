@@ -25,7 +25,7 @@ class StoreProductRequest extends FormRequest
         return [
             'title' => 'required|string|max:50',
             'description' => 'required|string|max:1000',
-            'cover_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cover_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5000',
             'price' => 'required|numeric|min:0',
             'discount_amount' => 'nullable|numeric|min:0|lte:price',
             'variants' => ['required', 'array', 'min:1'],
@@ -33,7 +33,7 @@ class StoreProductRequest extends FormRequest
             'variants.*.color' => ['required', 'string', 'max:50'],
             'variants.*.stock' => ['required', 'integer', 'min:0'],
             'product_pictures' => 'nullable|array',
-            'product_pictures.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'product_pictures.*' => 'image|mimes:jpg,jpeg,png,webp|max:5000',
             'sub_categories' => 'required|array|min:1',
             'sub_categories.*' => 'exists:sub_category,id',
             'attributes' => 'sometimes|array|nullable',
