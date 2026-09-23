@@ -1,2 +1,64 @@
 @import '@fontsource-variable/readex-pro';
 @import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+
+.product-main-image-frame,
+.product-thumbnail-frame {
+    width: 100%;
+    background: #f8f9fa;
+}
+
+.product-main-image-frame {
+    height: 32.5rem;
+}
+
+.product-detail-image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.product-main-image-frame .product-detail-image {
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-detail-placeholder {
+    width: 100%;
+    min-height: 22rem;
+}
+
+.product-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+.product-gallery.is-masonry {
+    grid-auto-rows: 8px;
+}
+
+.product-gallery-item {
+    min-width: 0;
+    align-self: start;
+}
+
+.product-thumbnail-frame .product-detail-image {
+    max-height: 24rem;
+    object-fit: contain;
+}
+
+@media (max-width: 767.98px) {
+    .product-main-image-frame {
+        height: 22rem;
+    }
+
+    .product-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .75rem;
+    }
+
+    .product-thumbnail-frame .product-detail-image {
+        max-height: 18rem;
+    }
+}

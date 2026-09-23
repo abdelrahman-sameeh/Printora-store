@@ -25,23 +25,22 @@
 
         <div class="row g-4">
             <div class="col-lg-7">
-                <div class="dashboard-card card border-0 overflow-hidden">
+                <div class="product-main-image-frame dashboard-card card border-0 overflow-hidden">
                     @if ($product->cover_image)
-                        <img class="w-100" style="max-height: 520px; object-fit: contain; background: #f8f9fa;"
+                        <img class="product-detail-image"
                             src="{{ $product->cover_image_url }}" alt="{{ $product->title }}">
                     @else
-                        <div class="d-flex align-items-center justify-content-center bg-light text-muted"
-                            style="height: 360px;">لا توجد صورة رئيسية</div>
+                        <div class="product-detail-placeholder d-flex align-items-center justify-content-center bg-light text-muted">لا توجد صورة رئيسية</div>
                     @endif
                 </div>
 
                 @if ($product->pictures->isNotEmpty())
-                    <div class="row g-3 mt-1">
+                    <div class="product-gallery mt-3">
                         @foreach ($product->pictures as $picture)
-                            <div class="col-6 col-md-4">
-                                <a class="d-block dashboard-card card border-0 overflow-hidden" href="{{ $picture->picture_url }}"
+                            <div class="product-gallery-item">
+                                <a class="product-thumbnail-frame d-block dashboard-card card border-0 overflow-hidden" href="{{ $picture->picture_url }}"
                                     target="_blank" rel="noopener">
-                                    <img class="w-100" style="height: 150px; object-fit: cover;" src="{{ $picture->picture_url }}"
+                                    <img class="product-detail-image" src="{{ $picture->picture_url }}"
                                         alt="صورة إضافية لـ {{ $product->title }}">
                                 </a>
                             </div>

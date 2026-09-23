@@ -24,6 +24,7 @@
 
         body {
             min-height: 100vh;
+            padding-top: 5.25rem;
             color: var(--ink);
             font-family: "Readex Pro Variable", sans-serif;
             background:
@@ -36,6 +37,31 @@
             color: var(--ink);
             font-weight: 700;
             letter-spacing: -.04em;
+        }
+
+        .site-navbar {
+            z-index: 1030;
+            background: rgba(255, 255, 255, .94) !important;
+            box-shadow: 0 .35rem 1.25rem rgba(16, 24, 40, .06);
+            backdrop-filter: blur(14px);
+        }
+
+        .site-navbar .navbar-toggler {
+            width: 2.85rem;
+            height: 2.85rem;
+            padding: .5rem;
+            border-color: #e4e7ec;
+            border-radius: .75rem;
+            box-shadow: none;
+        }
+
+        .site-navbar .navbar-toggler:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 .25rem rgba(91, 76, 240, .18);
+        }
+
+        .navbar-actions {
+            margin-inline-start: auto;
         }
 
         .brand-mark {
@@ -52,6 +78,33 @@
 
         .page-shell {
             min-height: calc(100vh - 73px);
+        }
+
+        @media (max-width: 991.98px) {
+            .site-navbar .navbar-collapse {
+                max-height: calc(100vh - 5.25rem);
+                overflow-y: auto;
+                border-top: 1px solid #eaecf0;
+            }
+
+            .navbar-actions .btn,
+            .navbar-actions form,
+            .navbar-actions form .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 359.98px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .brand-mark {
+                width: 2rem;
+                height: 2rem;
+                margin-left: .4rem;
+                font-size: .85rem;
+            }
         }
 
         .auth-card {
@@ -251,14 +304,20 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand bg-white border-bottom py-3">
+    <nav class="navbar navbar-expand-lg fixed-top site-navbar border-bottom py-3" aria-label="التنقل الرئيسي">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
                 <span class="brand-mark">PS</span>
                 <span class="text-capitalize">printora store</span>
             </a>
 
-            <div class="d-flex align-items-center gap-2">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="فتح قائمة التنقل">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <div class="navbar-actions d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 pt-3 pt-lg-0">
                 @auth
                     @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
                         <a @class(['btn px-3', 'btn-brand' => request()->routeIs('orders.*'), 'btn-light' => !request()->routeIs('orders.*')]) href="{{ route('orders.index') }}"
@@ -278,6 +337,7 @@
                     <a @class(['btn px-3', 'btn-brand' => request()->routeIs('register*'), 'btn-outline-primary' => !request()->routeIs('register*')]) href="{{ route('register') }}"
                         @if (request()->routeIs('register*')) aria-current="page" @endif>حساب جديد</a>
                 @endauth
+                </div>
             </div>
         </div>
     </nav>

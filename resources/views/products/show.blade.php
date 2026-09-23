@@ -26,12 +26,12 @@
 
     <div class="row g-4">
       <div class="col-lg-7">
-        <div class="dashboard-card card border-0 overflow-hidden">
+        <div class="product-main-image-frame dashboard-card card border-0 overflow-hidden">
           @if ($product->cover_image)
-            <img class="w-100" style="max-height: 520px; object-fit: contain; background: #f8f9fa;"
+            <img class="product-detail-image"
               src="{{ $product->cover_image_url }}" alt="{{ $product->title }}">
           @else
-            <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height: 360px;">
+            <div class="product-detail-placeholder d-flex align-items-center justify-content-center bg-light text-muted">
               لا توجد صورة رئيسية
             </div>
           @endif
@@ -40,12 +40,12 @@
         @if ($product->pictures->isNotEmpty())
           <div class="mt-3">
             <h2 class="h6 fw-bold mb-3">صور إضافية</h2>
-            <div class="row g-3">
+            <div class="product-gallery">
               @foreach ($product->pictures as $picture)
-                <div class="col-6 col-md-4">
-                  <a class="d-block dashboard-card card border-0 overflow-hidden" href="{{ $picture->picture_url }}"
+                <div class="product-gallery-item">
+                  <a class="product-thumbnail-frame d-block dashboard-card card border-0 overflow-hidden" href="{{ $picture->picture_url }}"
                     target="_blank" rel="noopener">
-                    <img class="w-100" style="height: 150px; object-fit: cover;" src="{{ $picture->picture_url }}"
+                    <img class="product-detail-image" src="{{ $picture->picture_url }}"
                       alt="صورة إضافية لـ {{ $product->title }}">
                   </a>
                 </div>
