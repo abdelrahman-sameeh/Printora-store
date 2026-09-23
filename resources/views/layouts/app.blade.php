@@ -62,6 +62,77 @@
 
         .navbar-actions {
             margin-inline-start: auto;
+            padding: .3rem;
+            border: 1px solid rgba(16, 24, 40, .06);
+            border-radius: 1rem;
+            background: rgba(248, 249, 252, .86);
+        }
+
+        .site-navbar .navbar-actions .btn {
+            min-height: 2.65rem;
+            padding: .55rem .9rem !important;
+            border-color: transparent;
+            border-radius: .75rem;
+            box-shadow: none;
+            white-space: nowrap;
+        }
+
+        .site-navbar .navbar-actions .btn:hover {
+            transform: none;
+        }
+
+        .site-navbar .navbar-actions .btn-light {
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .site-navbar .navbar-actions .btn-light:hover,
+        .site-navbar .navbar-actions .btn-light:focus {
+            color: var(--brand-dark);
+            border-color: rgba(91, 76, 240, .12);
+            background: var(--brand-soft);
+        }
+
+        .site-navbar .navbar-actions .btn-brand {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--brand), #796cf7);
+            box-shadow: 0 .4rem 1rem rgba(91, 76, 240, .24);
+        }
+
+        .site-navbar .navbar-actions .btn-outline-primary {
+            color: var(--brand-dark);
+            border-color: rgba(91, 76, 240, .12);
+            background: var(--brand-soft);
+        }
+
+        .site-navbar .navbar-actions .btn-outline-danger {
+            color: var(--danger-dark);
+            border-color: transparent;
+            background: transparent;
+        }
+
+        .site-navbar .navbar-actions .btn-outline-danger:hover,
+        .site-navbar .navbar-actions .btn-outline-danger:focus {
+            color: #fff;
+            border-color: var(--danger);
+            background: var(--danger);
+        }
+
+        .navbar-brand {
+            min-width: 0;
+        }
+
+        .navbar-brand-name {
+            min-width: 0;
+            line-height: 1.25;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-brand {
+                max-width: calc(100% - 4rem);
+            }
         }
 
         .brand-mark {
@@ -306,9 +377,29 @@
 <body>
     <nav class="navbar navbar-expand-lg fixed-top site-navbar border-bottom py-3" aria-label="التنقل الرئيسي">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                <span class="brand-mark">PS</span>
-                <span class="text-capitalize">printora store</span>
+            <a class="navbar-brand d-flex align-items-center" href="{{ isset($storeSeller) && $storeSeller ? route('stores.show', $storeSeller) : route('home') }}">
+                <span class="brand-mark">
+                    @if (isset($storeSeller) && $storeSeller)
+                        {{ mb_strtoupper(mb_substr($storeSeller->first_name, 0, 1) . mb_substr($storeSeller->last_name, 0, 1)) }}
+                    @else
+                        @auth
+                            {{ mb_strtoupper(mb_substr(auth()->user()->first_name, 0, 1) . mb_substr(auth()->user()->last_name, 0, 1)) }}
+                        @else
+                            PS
+                        @endauth
+                    @endif
+                </span>
+                <span class="navbar-brand-name">
+                    @if (isset($storeSeller) && $storeSeller)
+                        متجر {{ trim($storeSeller->first_name . ' ' . $storeSeller->last_name) }}
+                    @else
+                        @auth
+                            {{ trim(auth()->user()->first_name . ' ' . auth()->user()->last_name) }}
+                        @else
+                            زائر Printora
+                        @endauth
+                    @endif
+                </span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
@@ -318,6 +409,24 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <div class="navbar-actions d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 pt-3 pt-lg-0">
+                    <a
+                    @class([
+                        'btn px-3',
+                        'btn-brand' => request()->routeIs('home', 'stores.show'),
+                        'btn-light' => !request()->routeIs('home', 'stores.show'),
+                    ])
+                    href="{{ route('home') }}"
+                    >
+                        الرئيسية
+                    </a>
+                    <a @class([
+                        'btn px-3',
+                        'btn-brand' => request()->routeIs('stores.index'),
+                        'btn-light' => !request()->routeIs('stores.index'),
+                    ]) href="{{ route('stores.index') }}"
+                        @if (request()->routeIs('stores.index')) aria-current="page" @endif>
+                        المتاجر
+                    </a>
                 @auth
                     @if (auth()->user()->hasRole(\App\Enums\RoleName::USER))
                         <a @class(['btn px-3', 'btn-brand' => request()->routeIs('orders.*'), 'btn-light' => !request()->routeIs('orders.*')]) href="{{ route('orders.index') }}"

@@ -72,7 +72,7 @@
                     @endphp
                     <article class="row g-3 align-items-center border-bottom pb-3">
                       <div class="col-4 col-md-2">
-                        <a href="{{ route('products.show', $item['product']['id']) }}">
+                        <a href="{{ route('stores.products.show', [$group['seller_id'], $item['product']['id']]) }}">
                           @if ($item['product']['cover_image'])
                             <img class="rounded-3 w-100" style="aspect-ratio: 1; object-fit: cover;"
                               src="{{ $item['product']['cover_image'] }}" alt="{{ $item['product']['title'] }}">
@@ -85,7 +85,7 @@
                       <div class="col-8 col-md-3">
                         <h3 class="h6 fw-bold mb-1">
                           <a class="text-dark text-decoration-none"
-                            href="{{ route('products.show', $item['product']['id']) }}">
+                            href="{{ route('stores.products.show', [$group['seller_id'], $item['product']['id']]) }}">
                             {{ $item['product']['title'] }}
                           </a>
                         </h3>

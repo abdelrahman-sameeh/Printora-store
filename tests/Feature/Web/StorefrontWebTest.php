@@ -18,7 +18,8 @@ class StorefrontWebTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('action="'.route('products.search').'"', false)
-            ->assertSee('متجر Printora الرسمي')
+            ->assertSee('تسوّق من متاجر مميزة')
+            ->assertSee(route('stores.index'), false)
             ->assertSee('ستايلك يبدأ من هنا')
             ->assertDontSee('متجر متعدد البائعين')
             ->assertDontSee('بائعين مختلفين');
@@ -53,7 +54,7 @@ class StorefrontWebTest extends TestCase
         $this->get(route('products.search', ['q' => 'Wireless']))
             ->assertOk()
             ->assertSee('Wireless Headphones')
-            ->assertSee(route('products.show', $matchingProduct), false)
+            ->assertSee(route('stores.products.show', [$seller, $matchingProduct]), false)
             ->assertSee('stretched-link', false)
             ->assertDontSee('Coffee Maker')
             ->assertDontSee('Wireless Mouse');
@@ -205,6 +206,9 @@ class StorefrontWebTest extends TestCase
         ]);
 
         $this->get(route('products.show', $activeProduct))
+            ->assertRedirect(route('stores.products.show', [$seller, $activeProduct]));
+
+        $this->get(route('stores.products.show', [$seller, $activeProduct]))
             ->assertOk()
             ->assertSee('Public Product')
             ->assertSee('225.00')
@@ -238,7 +242,7 @@ class StorefrontWebTest extends TestCase
         ]);
 
         $this->actingAs($buyer)
-            ->get(route('products.show', $product))
+            ->get(route('stores.products.show', [$seller, $product]))
             ->assertOk()
             ->assertSee('id="variant-color"', false)
             ->assertSee('id="variant-size"', false)
@@ -248,6 +252,154 @@ class StorefrontWebTest extends TestCase
             ->assertSee('data-action="increase"', false)
             ->assertSee('أسود')
             ->assertSee('أزرق');
+    }
+
+    public function test_visitors_can_browse_and_search_stores_by_seller_name(): void
+    {
+        $seller = $this->createSeller();
+        $seller->products()->create([
+            'title' => 'Visible Store Product',
+            'description' => 'Counts as an active product.',
+            'price' => 100,
+            'discount_amount' => 0,
+        ]);
+        $seller->products()->create([
+            'title' => 'Hidden Store Product',
+            'description' => 'Must not count as active.',
+            'price' => 100,
+            'discount_amount' => 0,
+            'is_active' => false,
+        ]);
+        $otherSeller = User::create([
+            'first_name' => 'Boutique',
+            'last_name' => 'Owner',
+            'email' => 'boutique-owner@example.com',
+            'password' => 'password123',
+        ])->syncRoles(RoleName::SELLER);
+        $buyer = User::create([
+            'first_name' => 'Regular',
+            'last_name' => 'Buyer',
+            'email' => 'regular-buyer@example.com',
+            'password' => 'password123',
+        ]);
+
+        $this->get(route('stores.index'))
+            ->assertOk()
+            ->assertSee('متجر Storefront Seller')
+            ->assertSee('متجر Boutique Owner')
+            ->assertSee('1 منتج متاح')
+            ->assertSee(route('stores.show', $seller), false)
+            ->assertDontSee('Regular Buyer');
+
+        $this->get(route('stores.index', ['q' => 'Boutique']))
+            ->assertOk()
+            ->assertSee('متجر Boutique Owner')
+            ->assertDontSee('متجر Storefront Seller')
+            ->assertDontSee('Regular Buyer');
+
+        $this->get(route('stores.index', ['q' => 'Storefront Seller']))
+            ->assertOk()
+            ->assertSee('متجر Storefront Seller')
+            ->assertDontSee('متجر Boutique Owner');
+    }
+
+    public function test_seller_store_only_shows_its_own_active_products(): void
+    {
+        $seller = $this->createSeller();
+        $otherSeller = User::create([
+            'first_name' => 'Other',
+            'last_name' => 'Seller',
+            'email' => 'other-storefront-seller@example.com',
+            'password' => 'password123',
+        ])->syncRoles(RoleName::SELLER);
+
+        $ownProduct = $seller->products()->create([
+            'title' => 'Seller Exclusive Product',
+            'description' => 'Visible only in this seller store.',
+            'price' => 400,
+            'discount_amount' => 0,
+        ]);
+        $seller->products()->create([
+            'title' => 'Seller Hidden Product',
+            'description' => 'Inactive product.',
+            'price' => 200,
+            'discount_amount' => 0,
+            'is_active' => false,
+        ]);
+        $otherSeller->products()->create([
+            'title' => 'Other Seller Product',
+            'description' => 'Must not leak into this store.',
+            'price' => 300,
+            'discount_amount' => 0,
+        ]);
+
+        $this->get(route('stores.show', $seller))
+            ->assertOk()
+            ->assertSee('متجر Storefront Seller')
+            ->assertSee('Seller Exclusive Product')
+            ->assertSee(route('stores.search', $seller), false)
+            ->assertSee(route('stores.products.show', [$seller, $ownProduct]), false)
+            ->assertDontSee('Seller Hidden Product')
+            ->assertDontSee('Other Seller Product');
+    }
+
+    public function test_seller_store_search_stays_scoped_to_that_seller(): void
+    {
+        $seller = $this->createSeller();
+        $otherSeller = User::create([
+            'first_name' => 'Search',
+            'last_name' => 'Competitor',
+            'email' => 'search-competitor@example.com',
+            'password' => 'password123',
+        ])->syncRoles(RoleName::SELLER);
+
+        $seller->products()->create([
+            'title' => 'Scoped Search Shirt',
+            'description' => 'Owned by the selected seller.',
+            'price' => 250,
+            'discount_amount' => 0,
+        ]);
+        $otherSeller->products()->create([
+            'title' => 'Scoped Search Jacket',
+            'description' => 'Owned by another seller.',
+            'price' => 450,
+            'discount_amount' => 0,
+        ]);
+
+        $this->get(route('stores.search', [$seller, 'q' => 'Scoped Search']))
+            ->assertOk()
+            ->assertSee('Scoped Search Shirt')
+            ->assertDontSee('Scoped Search Jacket')
+            ->assertSee('كل النتائج والفلاتر محصورة في منتجات هذا البائع');
+    }
+
+    public function test_seller_store_rejects_products_owned_by_another_seller(): void
+    {
+        $seller = $this->createSeller();
+        $otherSeller = User::create([
+            'first_name' => 'Protected',
+            'last_name' => 'Seller',
+            'email' => 'protected-seller@example.com',
+            'password' => 'password123',
+        ])->syncRoles(RoleName::SELLER);
+        $otherProduct = $otherSeller->products()->create([
+            'title' => 'Protected Product',
+            'description' => 'Owned by another seller.',
+            'price' => 500,
+            'discount_amount' => 0,
+        ]);
+        $buyer = User::create([
+            'first_name' => 'Not',
+            'last_name' => 'Seller',
+            'email' => 'not-a-seller@example.com',
+            'password' => 'password123',
+        ]);
+
+        $this->get(route('stores.products.show', [$seller, $otherProduct]))
+            ->assertNotFound();
+
+        $this->get(route('stores.show', $buyer))
+            ->assertNotFound();
     }
 
     private function createSeller(): User

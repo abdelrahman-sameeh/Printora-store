@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'البحث عن المنتجات | Printora')
+@php
+    $isSellerStore = isset($storeSeller) && $storeSeller;
+    $storeName = $isSellerStore
+        ? trim($storeSeller->first_name . ' ' . $storeSeller->last_name)
+        : 'Printora';
+    $storeHomeUrl = $isSellerStore
+        ? route('stores.show', $storeSeller)
+        : route('home');
+    $storeSearchUrl = $isSellerStore
+        ? route('stores.search', $storeSeller)
+        : route('products.search');
+    $productUrl = fn ($product) => $isSellerStore
+        ? route('stores.products.show', [$storeSeller, $product])
+        : route('stores.products.show', [$product->seller_id, $product]);
+@endphp
+
+@section('title', $isSellerStore ? 'البحث في متجر ' . $storeName . ' | Printora' : 'البحث عن المنتجات | Printora')
 
 @section('content')
     @php
@@ -18,11 +34,11 @@
 
     <div class="container py-5">
         <div class="mb-4">
-            <a class="text-brand text-decoration-none fw-semibold" href="{{ route('home') }}">العودة للرئيسية</a>
+            <a class="text-brand text-decoration-none fw-semibold" href="{{ $storeHomeUrl }}">العودة للرئيسية</a>
             <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mt-2">
                 <div>
-                    <h1 class="fw-bold mb-1">ابحث في المنتجات</h1>
-                    <p class="text-muted-custom mb-0">استخدم البحث والفلاتر للوصول للمنتج المناسب.</p>
+                    <h1 class="fw-bold mb-1">{{ $isSellerStore ? 'ابحث في متجر ' . $storeName : 'ابحث في المنتجات' }}</h1>
+                    <p class="text-muted-custom mb-0">{{ $isSellerStore ? 'كل النتائج والفلاتر محصورة في منتجات هذا البائع.' : 'استخدم البحث والفلاتر للوصول للمنتج المناسب.' }}</p>
                 </div>
                 <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis px-3 py-2">
                     {{ $products->total() }} نتيجة
@@ -30,7 +46,7 @@
             </div>
         </div>
 
-        <form class="dashboard-card card border-0 mb-4" method="GET" action="{{ route('products.search') }}"
+        <form class="dashboard-card card border-0 mb-4" method="GET" action="{{ $storeSearchUrl }}"
             role="search">
             <div class="card-body p-3 p-md-4">
                 <label class="visually-hidden" for="search-query">ابحث عن منتج</label>
@@ -44,7 +60,7 @@
 
         <div class="row g-4 align-items-start">
             <aside class="col-lg-3">
-                <form class="dashboard-card card border-0" method="GET" action="{{ route('products.search') }}">
+                <form class="dashboard-card card border-0" method="GET" action="{{ $storeSearchUrl }}">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <h2 class="h5 fw-bold mb-0">تصفية النتائج</h2>
@@ -145,7 +161,7 @@
 
                         <div class="d-grid gap-2">
                             <button class="btn btn-brand" type="submit">تطبيق الفلاتر</button>
-                            <a class="btn btn-light" href="{{ route('products.search') }}">إعادة الضبط</a>
+                            <a class="btn btn-light" href="{{ $storeSearchUrl }}">إعادة الضبط</a>
                         </div>
                     </div>
                 </form>
@@ -158,7 +174,7 @@
                             <div class="fs-1 mb-3">🔍</div>
                             <h2 class="h4 fw-bold">لا توجد نتائج مطابقة</h2>
                             <p class="text-muted-custom mb-4">جرّب تعديل كلمة البحث أو إزالة بعض الفلاتر.</p>
-                            <a class="btn btn-brand" href="{{ route('products.search') }}">عرض كل المنتجات</a>
+                            <a class="btn btn-brand" href="{{ $storeSearchUrl }}">عرض كل المنتجات</a>
                         </div>
                     </div>
                 @else
@@ -166,7 +182,7 @@
                         @foreach ($products as $product)
                             <div class="col-md-6 col-xl-4">
                                 <article class="dashboard-card card border-0 h-100 overflow-hidden position-relative">
-                                    <a href="{{ route('products.show', $product) }}">
+                                    <a href="{{ $productUrl($product) }}">
                                         @if ($product->cover_image)
                                             <img class="w-100" style="height: 210px; object-fit: cover;"
                                                 src="{{ $product->cover_image_url }}" alt="{{ $product->title }}">
@@ -187,7 +203,7 @@
                                         </div>
                                         <h2 class="h5 fw-bold mb-2">
                                             <a class="text-dark text-decoration-none stretched-link"
-                                                href="{{ route('products.show', $product) }}">{{ $product->title }}</a>
+                                                href="{{ $productUrl($product) }}">{{ $product->title }}</a>
                                         </h2>
                                         <p class="text-muted-custom small mb-3">{{ Str::limit($product->description, 80) }}</p>
 
@@ -202,7 +218,7 @@
                                                     {{ number_format($product->price_after_discount, 2) }} جنيه
                                                 </strong>
                                             </div>
-                                            <a class="btn btn-brand" href="{{ route('products.show', $product) }}">عرض</a>
+                                            <a class="btn btn-brand" href="{{ $productUrl($product) }}">عرض</a>
                                         </div>
                                     </div>
                                 </article>

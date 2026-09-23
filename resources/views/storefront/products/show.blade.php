@@ -1,6 +1,19 @@
 @extends('layouts.app')
 
-@section('title', $product->title . ' | Printora')
+@php
+    $isSellerStore = isset($storeSeller) && $storeSeller;
+    $storeName = $isSellerStore
+        ? trim($storeSeller->first_name . ' ' . $storeSeller->last_name)
+        : 'Printora';
+    $storeHomeUrl = $isSellerStore
+        ? route('stores.show', $storeSeller)
+        : route('home');
+    $storeSearchUrl = $isSellerStore
+        ? route('stores.search', $storeSeller)
+        : route('products.search');
+@endphp
+
+@section('title', $product->title . ' | ' . ($isSellerStore ? 'متجر ' . $storeName : 'Printora'))
 
 @section('content')
     @php
@@ -17,9 +30,18 @@
 
     <div class="container py-5">
         <div class="mb-4">
-            <a class="text-brand text-decoration-none fw-semibold" href="{{ route('home') }}#products">
-                العودة للمنتجات
+            <a class="text-brand text-decoration-none fw-semibold" href="{{ $storeHomeUrl }}#products">
+                {{ $isSellerStore ? 'العودة لمتجر ' . $storeName : 'العودة للمنتجات' }}
             </a>
+            @if ($isSellerStore)
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-2 rounded-4 bg-white border p-3 shadow-sm">
+                    <div>
+                        <small class="text-muted-custom d-block">أنت تتسوق الآن داخل</small>
+                        <strong class="text-brand">متجر {{ $storeName }}</strong>
+                    </div>
+                    <a class="btn btn-outline-primary" href="{{ $storeSearchUrl }}">كل منتجات المتجر</a>
+                </div>
+            @endif
             <h1 class="fw-bold mt-2 mb-1">{{ $product->title }}</h1>
         </div>
 
